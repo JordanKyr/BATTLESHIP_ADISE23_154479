@@ -1,15 +1,23 @@
-DROP TABLE board;
-DROP TABLE projection;
-DROP TABLE players;
+DROP TABLE IF EXISTS ships;
+DROP TABLE IF EXISTS  game_status;
+DROP TABLE IF EXISTS projection;
+DROP TABLE IF EXISTS players;
 
-CREATE TABLE players (
+
+CREATE TABLE players (                          /* pinakas paikton*/
     player_id tinyint(1)  NOT NULL,
     username VARCHAR(20) DEFAULT NULL,
     token VARCHAR(100) DEFAULT NULL,
-    last_action timestamp NULL DEFAULT NULL,
+    last_action TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY(player_id)
 
 );
+
+
+
+
+
+
 
 /*CREATE TABLE board (
         board_id tinyint(1)  NOT NULL,
@@ -25,7 +33,7 @@ CREATE TABLE players (
 ); */
 
 
-CREATE TABLE projection (
+CREATE TABLE projection (                                       /*pinakas toy board kathe paikti*/
         projection_id tinyint(1) NOT NULL,
         player_id tinyint(1) DEFAULT NULL, 
         x_p tinyint(1) NOT NULL,
@@ -38,21 +46,63 @@ CREATE TABLE projection (
         CONSTRAINT fk_type2 
         FOREIGN KEY(player_id) 
         REFERENCES players(player_id)
+        ON DELETE CASCADE 
     
 );
 
 
-CREATE TABLE game_status (
+CREATE TABLE game_status (                                                                                      /*pinakas katastasis paixnidiou*/
         game_stat ENUM('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
-        p_turn ENUM(1,2) DEFAULT NULL,
-        result ENUM(1,2) DEFAULT NULL,
-        last_change timestamp NULL DEFAULT NULL
+        p_turn ENUM('1','2') DEFAULT NULL,
+        result ENUM('1','2') DEFAULT NULL,
+        last_change TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 );
 
+INSERT INTO game_status(game_stat,p_turn,result,last_change)  VALUE                     /*arxikopoiisi status paixnidiou*/
+('not active','1', NULL, NULL); 
 
-INSERT INTO players(player_id,username,token,last_action) VALUES
-                (1,'protos',NULL,NULL),
+INSERT INTO players(player_id,username,token,last_action) VALUES                        /*eisagogi paikton ston pinaka, to paixnidi paizetai apo 2 paiktes*/
+                (1,'protos',NULL,NULL), 
                 (2, 'deuteros',NULL,NULL);
+
+
+CREATE TABLE ships (                                                                    /*pinakas karavion, ton onomaton kai ton xaraktiristikon tous*/
+        ship_id tinyint(1) NOT NULL AUTO_INCREMENT,
+        player_id tinyint(1) DEFAULT NULL,
+        ship_name VARCHAR(100) DEFAULT NULL,
+        ship_size tinyint(1) DEFAULT NULL,
+        start_row tinyint(1) DEFAULT NULL,
+        end_row tinyint(1) DEFAULT NULL,
+        start_col tinyint(1) DEFAULT NULL,
+        end_col tinyint(1) DEFAULT NULL,
+        PRIMARY KEY(ship_id),
+
+        CONSTRAINT fk_type3
+        FOREIGN KEY(player_id)
+        REFERENCES players(player_id)
+        ON DELETE CASCADE 
+);
+
+INSERT INTO ships(player_id,ship_name,ship_size,start_row,end_row,start_col,end_col) VALUES             /*arxikopoisi pinaka ploion*/
+                (1, "Carrier", 5 , NULL, NULL, NULL,NULL ),
+                (2, "Carrier", 5 , NULL, NULL, NULL,NULL),
+                (1, "Battleship", 4 , NULL, NULL, NULL,NULL ),
+                (2, "Battleship", 4 , NULL, NULL, NULL,NULL ),
+                (1, "Cruiser", 3 , NULL, NULL, NULL,NULL ),
+                (2, "Cruiser", 3 , NULL, NULL, NULL,NULL ),
+                (1, "Submarine", 3 , NULL, NULL, NULL,NULL ),
+                (2, "Submarine", 3 , NULL, NULL, NULL,NULL ),
+                (1, "Niki", 2 , NULL, NULL, NULL,NULL ),
+                (2, "Niki", 2 , NULL, NULL, NULL,NULL );
+
+                
+
+
+
+
+
+
+
 /*
 INSERT INTO board(board_id, player_id, x, y) VALUES
                             (1, 1, 1, 1),
@@ -258,7 +308,7 @@ INSERT INTO board(board_id, player_id, x, y) VALUES
                             (2, 2, 10, 10);
 */
 
-INSERT INTO projection(projection_id, player_id, x_p, y_p, cell_status) VALUES
+INSERT INTO projection(projection_id, player_id, x_p, y_p, cell_status) VALUES                                                  /*dimiourgia ton board ton 2 paikton*/
                                 (1, 1, 1, 1, NULL),
                                 (1, 1, 2, 1, NULL),
                                 (1, 1, 3, 1, NULL),
@@ -452,3 +502,47 @@ INSERT INTO projection(projection_id, player_id, x_p, y_p, cell_status) VALUES
                                 (2, 2, 10, 10, NULL);
 
 
+DROP PROCEDURE IF EXISTS set_piece;
+                                                                                                                                /*procedure gia tin topothetisi ton ploion*/
+DELIMITER //
+        CREATE PROCEDURE set_piece(s_id tinyint, p_id tinyint, start_x tinyint, end_x tinyint, start_y tinyint, end_y tinyint)
+        BEGIN 
+              DECLARE outofbounds, place_occupied VARCHAR(255);        
+              DECLARE c_stat tinyint(1); 
+              SELECT cell_status INTO c_stat FROM projection
+              WHERE  x_p=start_x AND y_p=start_y AND player_id=p_id;
+
+                                                                                        /*elegxos gia lathos timon theseon ploion*/
+              SET outofbounds='Ouf of Bounds.';
+              SET place_occupied='Ship Already There.';  
+
+                IF (start_x < 1 OR start_x > 10 OR end_x < 1 OR end_x > 10 OR start_y < 1 OR start_y > 10 OR end_y < 1 OR end_y > 10 )THEN
+                SELECT CONCAT('ERROR: ', outofbounds) ;
+                
+                ELSEIF (c_stat IS NOT NULL) THEN
+                SELECT CONCAT('ERROR: ', place_occupied);
+
+                ELSE 
+                UPDATE ships
+                set start_row=start_x, end_row=end_x,start_col=start_y, end_col=end_y                                                 /*enimerosi thesis ploiou kai game status*/
+                where ship_id=s_id and player_id=p_id;
+ 
+                END IF; 
+
+                UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
+                UPDATE projection set cell_status=1 WHERE x_p=start_x AND y_p=start_y;
+                END//
+DELIMITER ;
+
+/*
+
+CALL set_piece(1,1,2,2,2,6);
+
+*/
+
+/*
+ ELSE IF (select start_row, start_col, end_row, end_col from ships 
+					 				WHERE start_row IS NOT NULL AND start_col IS NOT NULL
+									 AND end_row IS NOT NULL AND end_col IS NOT NULL
+									 AND player_id=p_id ) THEN
+*/                                                                         
