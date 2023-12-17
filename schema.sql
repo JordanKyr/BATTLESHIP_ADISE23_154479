@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS ships;
 DROP TABLE IF EXISTS  game_status;
 DROP TABLE IF EXISTS projection;
 DROP TABLE IF EXISTS players;
-
+DROP PROCEDURE IF EXISTS set_piece;
 
 CREATE TABLE players (                          /* pinakas paikton*/
     player_id tinyint(1)  NOT NULL,
@@ -502,35 +502,72 @@ INSERT INTO projection(projection_id, player_id, x_p, y_p, cell_status) VALUES  
                                 (2, 2, 10, 10, NULL);
 
 
-DROP PROCEDURE IF EXISTS set_piece;
+
                                                                                                                                 /*procedure gia tin topothetisi ton ploion*/
 DELIMITER //
         CREATE PROCEDURE set_piece(s_id tinyint, p_id tinyint, start_x tinyint, end_x tinyint, start_y tinyint, end_y tinyint)
         BEGIN 
               DECLARE outofbounds, place_occupied VARCHAR(255);        
-              DECLARE c_stat tinyint(1); 
-              SELECT cell_status INTO c_stat FROM projection
-              WHERE  x_p=start_x AND y_p=start_y AND player_id=p_id;
+              DECLARE c_stat,sh_size, count_x, count_y tinyint(1); 
+              SET c_stat=NULL ;
+              SET count_x=1;
+              SET count_y=1; 
 
+                SELECT ship_name INTO sh_size FROM ships
+                WHERE s_id=ship_id  ;                                             /*pairno to megethos toy ploioy*/
+
+              
+              SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
+              WHERE  x_p=start_x AND y_p=start_y AND player_id=p_id;
+                
+ /*LOOP CHECK*/       loop_check_rows_status: WHILE (c_stat IS NULL AND count_x < end_x-start_x-1)DO
+                SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
+                WHERE  x_p=start_x+count_x AND y_p=start_y AND player_id=p_id;
+                SET count_x= count_x +1 ;
+                END WHILE loop_check_rows_status;
+
+ /*LOOP CHECK*/       loop_check_cols_status: WHILE (c_stat IS NULL AND count_y <=end_y-start_y-1 )DO
+                SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
+                WHERE  x_p=start_x AND y_p=start_y+count_y AND player_id=p_id;
+                SET count_y= count_y+1;
+                END WHILE loop_check_cols_status;
+               
                                                                                         /*elegxos gia lathos timon theseon ploion*/
               SET outofbounds='Ouf of Bounds.';
               SET place_occupied='Ship Already There.';  
 
                 IF (start_x < 1 OR start_x > 10 OR end_x < 1 OR end_x > 10 OR start_y < 1 OR start_y > 10 OR end_y < 1 OR end_y > 10 )THEN
                 SELECT CONCAT('ERROR: ', outofbounds) ;
-                
                 ELSEIF (c_stat IS NOT NULL) THEN
                 SELECT CONCAT('ERROR: ', place_occupied);
-
+                
                 ELSE 
+                        BEGIN
+                set count_x=start_x;
+                set count_y=start_y;
+
+/*LOOP FILL*/        fill_rows_ship: WHILE count_x <= end_x AND start_x<>end_x DO
+                UPDATE projection
+                set cell_status=1 WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
+                set count_x= count_x+1;
+                END WHILE fill_rows_ship;
+
+/*LOOP FILL*/        fill_cols_ship: WHILE count_y <= end_y AND start_y<>end_y DO
+                UPDATE projection
+                set cell_status=1 WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
+                set count_y= count_y+1;     
+                END WHILE fill_cols_ship;           
+
                 UPDATE ships
                 set start_row=start_x, end_row=end_x,start_col=start_y, end_col=end_y                                                 /*enimerosi thesis ploiou kai game status*/
                 where ship_id=s_id and player_id=p_id;
- 
+
+               END;
+
                 END IF; 
 
                 UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
-                UPDATE projection set cell_status=1 WHERE x_p=start_x AND y_p=start_y;
+               /* UPDATE projection set cell_status=1 WHERE x_p=start_x AND y_p=start_y AND player_id=p_id; */
                 END//
 DELIMITER ;
 
