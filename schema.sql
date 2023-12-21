@@ -1,8 +1,10 @@
+DROP TABLE IF EXISTS targets;
 DROP TABLE IF EXISTS ships;
 DROP TABLE IF EXISTS  game_status;
 DROP TABLE IF EXISTS projection;
 DROP TABLE IF EXISTS players;
 DROP PROCEDURE IF EXISTS set_piece;
+DROP PROCEDURE IF EXISTS hit_piece;
 
 CREATE TABLE players (                          /* pinakas paikton*/
     player_id tinyint(1)  NOT NULL,
@@ -54,7 +56,7 @@ CREATE TABLE projection (                                       /*pinakas toy bo
 CREATE TABLE game_status (                                                                                      /*pinakas katastasis paixnidiou*/
         game_stat ENUM('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
         p_turn ENUM('1','2') DEFAULT NULL,
-        result ENUM('1','2') DEFAULT NULL,
+        result ENUM('1st Player Wins!','2nd Player Wins!') DEFAULT NULL,
         last_change TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 );
 
@@ -62,8 +64,8 @@ INSERT INTO game_status(game_stat,p_turn,result,last_change)  VALUE             
 ('not active','1', NULL, NULL); 
 
 INSERT INTO players(player_id,username,token,last_action) VALUES                        /*eisagogi paikton ston pinaka, to paixnidi paizetai apo 2 paiktes*/
-                (1,'protos',NULL,NULL), 
-                (2, 'deuteros',NULL,NULL);
+                (1,'1st',NULL,NULL), 
+                (2, '2nd',NULL,NULL);
 
 
 CREATE TABLE ships (                                                                    /*pinakas karavion, ton onomaton kai ton xaraktiristikon tous*/
@@ -96,10 +98,226 @@ INSERT INTO ships(player_id,ship_name,ship_size,start_row,end_row,start_col,end_
                 (2, "Niki", 2 , NULL, NULL, NULL,NULL );
 
                 
+                                                                                         /*pinakas stoxon*/
+CREATE TABLE targets(
+        target_id tinyint(1) NOT NULL,
+        player_id tinyint(1) DEFAULT NULL,
+        target_status enum('not_specified', 'hit', 'miss') DEFAULT 'not_specified',
+
+        x_t tinyint(1) NOT NULL,
+        y_t tinyint(1) NOT NULL,
+
+        PRIMARY KEY(target_id, x_t, y_t),
+
+        CONSTRAINT fk_type4
+        FOREIGN KEY(player_id)
+        REFERENCES players(player_id)
+        ON DELETE CASCADE 
+);
 
 
+INSERT INTO targets(target_id, player_id, x_t, y_t) VALUES
+                            (1, 1, 1, 1),
+                            (1, 1, 2, 1),
+                            (1, 1, 3, 1),
+                            (1, 1, 4, 1),
+                            (1, 1, 5, 1),
+                            (1, 1, 6, 1),
+                            (1, 1, 7, 1),
+                            (1, 1, 8, 1),
+                            (1, 1, 9, 1),
+                            (1, 1, 10, 1),
+                            (1, 1, 1, 2),
+                            (1, 1, 2, 2),
+                            (1, 1, 3, 2),
+                            (1, 1, 4, 2),
+                            (1, 1, 5, 2),
+                            (1, 1, 6, 2),
+                            (1, 1, 7, 2),
+                            (1, 1, 8, 2),
+                            (1, 1, 9, 2),
+                            (1, 1, 10, 2),
+                            (1, 1, 1, 3),
+                            (1, 1, 2, 3),
+                            (1, 1, 3, 3),
+                            (1, 1, 4, 3),
+                            (1, 1, 5, 3),
+                            (1, 1, 6, 3),
+                            (1, 1, 7, 3),
+                            (1, 1, 8, 3),
+                            (1, 1, 9, 3),
+                            (1, 1, 10, 3),
+                            (1, 1, 1, 4),
+                            (1, 1, 2, 4),
+                            (1, 1, 3, 4),
+                            (1, 1, 4, 4),
+                            (1, 1, 5, 4),
+                            (1, 1, 6, 4),
+                            (1, 1, 7, 4),
+                            (1, 1, 8, 4),
+                            (1, 1, 9, 4),
+                            (1, 1, 10, 4),
+                            (1, 1, 1, 5),
+                            (1, 1, 2, 5),
+                            (1, 1, 3, 5),
+                            (1, 1, 4, 5),
+                            (1, 1, 5, 5),
+                            (1, 1, 6, 5),
+                            (1, 1, 7, 5),
+                            (1, 1, 8, 5),
+                            (1, 1, 9, 5),
+                            (1, 1, 10, 5),
+                            (1, 1, 1, 6),
+                            (1, 1, 2, 6),
+                            (1, 1, 3, 6),
+                            (1, 1, 4, 6),
+                            (1, 1, 5, 6),
+                            (1, 1, 6, 6),
+                            (1, 1, 7, 6),
+                            (1, 1, 8, 6),
+                            (1, 1, 9, 6),
+                            (1, 1, 10, 6),
+                            (1, 1, 1, 7),
+                            (1, 1, 2, 7),
+                            (1, 1, 3, 7),
+                            (1, 1, 4, 7),
+                            (1, 1, 5, 7),
+                            (1, 1, 6, 7),
+                            (1, 1, 7, 7),
+                            (1, 1, 8, 7),
+                            (1, 1, 9, 7),
+                            (1, 1, 10, 7),
+                            (1, 1, 1, 8),
+                            (1, 1, 2, 8),
+                            (1, 1, 3, 8),
+                            (1, 1, 4, 8),
+                            (1, 1, 5, 8),
+                            (1, 1, 6, 8),
+                            (1, 1, 7, 8),
+                            (1, 1, 8, 8),
+                            (1, 1, 9, 8),
+                            (1, 1, 10, 8),
+                            (1, 1, 1, 9),
+                            (1, 1, 2, 9),
+                            (1, 1, 3, 9),
+                            (1, 1, 4, 9),
+                            (1, 1, 5, 9),
+                            (1, 1, 6, 9),
+                            (1, 1, 7, 9),
+                            (1, 1, 8, 9),
+                            (1, 1, 9, 9),
+                            (1, 1, 10, 9),
+                            (1, 1, 1, 10),
+                            (1, 1, 2, 10),
+                            (1, 1, 3, 10),
+                            (1, 1, 4, 10),
+                            (1, 1, 5, 10),
+                            (1, 1, 6, 10),
+                            (1, 1, 7, 10),
+                            (1, 1, 8, 10),
+                            (1, 1, 9, 10),
+                            (1, 1, 10, 10),
 
-
+                            (2, 2, 1, 1),
+                            (2, 2, 2, 1),
+                            (2, 2, 3, 1),
+                            (2, 2, 4, 1),
+                            (2, 2, 5, 1),
+                            (2, 2, 6, 1),
+                            (2, 2, 7, 1),
+                            (2, 2, 8, 1),
+                            (2, 2, 9, 1),
+                            (2, 2, 10, 1),
+                            (2, 2, 1, 2),
+                            (2, 2, 2, 2),
+                            (2, 2, 3, 2),
+                            (2, 2, 4, 2),
+                            (2, 2, 5, 2),
+                            (2, 2, 6, 2),
+                            (2, 2, 7, 2),
+                            (2, 2, 8, 2),
+                            (2, 2, 9, 2),
+                            (2, 2, 10, 2),
+                            (2, 2, 1, 3),
+                            (2, 2, 2, 3),
+                            (2, 2, 3, 3),
+                            (2, 2, 4, 3),
+                            (2, 2, 5, 3),
+                            (2, 2, 6, 3),
+                            (2, 2, 7, 3),
+                            (2, 2, 8, 3),
+                            (2, 2, 9, 3),
+                            (2, 2, 10, 3),
+                            (2, 2, 1, 4),
+                            (2, 2, 2, 4),
+                            (2, 2, 3, 4),
+                            (2, 2, 4, 4),
+                            (2, 2, 5, 4),
+                            (2, 2, 6, 4),
+                            (2, 2, 7, 4),
+                            (2, 2, 8, 4),
+                            (2, 2, 9, 4),
+                            (2, 2, 10, 4),
+                            (2, 2, 1, 5),
+                            (2, 2, 2, 5),
+                            (2, 2, 3, 5),
+                            (2, 2, 4, 5),
+                            (2, 2, 5, 5),
+                            (2, 2, 6, 5),
+                            (2, 2, 7, 5),
+                            (2, 2, 8, 5),
+                            (2, 2, 9, 5),
+                            (2, 2, 10, 5),
+                            (2, 2, 1, 6),
+                            (2, 2, 2, 6),
+                            (2, 2, 3, 6),
+                            (2, 2, 4, 6),
+                            (2, 2, 5, 6),
+                            (2, 2, 6, 6),
+                            (2, 2, 7, 6),
+                            (2, 2, 8, 6),
+                            (2, 2, 9, 6),
+                            (2, 2, 10, 6),
+                            (2, 2, 1, 7),
+                            (2, 2, 2, 7),
+                            (2, 2, 3, 7),
+                            (2, 2, 4, 7),
+                            (2, 2, 5, 7),
+                            (2, 2, 6, 7),
+                            (2, 2, 7, 7),
+                            (2, 2, 8, 7),
+                            (2, 2, 9, 7),
+                            (2, 2, 10, 7),
+                            (2, 2, 1, 8),
+                            (2, 2, 2, 8),
+                            (2, 2, 3, 8),
+                            (2, 2, 4, 8),
+                            (2, 2, 5, 8),
+                            (2, 2, 6, 8),
+                            (2, 2, 7, 8),
+                            (2, 2, 8, 8),
+                            (2, 2, 9, 8),
+                            (2, 2, 10, 8),
+                            (2, 2, 1, 9),
+                            (2, 2, 2, 9),
+                            (2, 2, 3, 9),
+                            (2, 2, 4, 9),
+                            (2, 2, 5, 9),
+                            (2, 2, 6, 9),
+                            (2, 2, 7, 9),
+                            (2, 2, 8, 9),
+                            (2, 2, 9, 9),
+                            (2, 2, 10, 9),
+                            (2, 2, 1, 10),
+                            (2, 2, 2, 10),
+                            (2, 2, 3, 10),
+                            (2, 2, 4, 10),
+                            (2, 2, 5, 10),
+                            (2, 2, 6, 10),
+                            (2, 2, 7, 10),
+                            (2, 2, 8, 10),
+                            (2, 2, 9, 10),
+                            (2, 2, 10, 10) ;
 
 
 
@@ -567,10 +785,94 @@ DELIMITER //
                 END IF; 
 
                 UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
-               /* UPDATE projection set cell_status=1 WHERE x_p=start_x AND y_p=start_y AND player_id=p_id; */
+             
                 END//
 DELIMITER ;
 
+
+DELIMITER //
+        CREATE PROCEDURE hit_piece(p_id tinyint, t_id tinyint, x tinyint, y tinyint)                    /* procedure gia na epilegei o xristis poy xtipaei ton antipalo*/
+        BEGIN 
+                DECLARE enemy_player, target_from_projection, win_check, turn_flag tinyint(1);
+                DECLARE miss_cell, outofbounds, hit_cell, win_game, player_turn, winner VARCHAR(255);
+                SET enemy_player=if(p_id=1, 2, 1);
+               
+
+                SET target_from_projection=NULL;
+                SET miss_cell='Hit Missed, Cell was Empty.';                            
+                SET outofbounds='Ouf of Bounds.';
+                SET hit_cell='Hit!';
+                SET win_game='You Have Won the Game!';
+                SET win_check= 17;
+
+            /*    SET turn_flag=0; */
+             /*   SELECT p_turn_temp INTO player_turn FROM game_status;  pairno gia temp tin seira toy paikti poy paizei tora */
+                
+
+
+                IF (x < 1 OR x > 10 OR y < 1 OR y > 10 )THEN
+                SELECT CONCAT('ERROR: ', outofbounds) ;
+                
+                ELSE 
+                        BEGIN
+
+                                SELECT cell_status INTO target_from_projection FROM projection
+                                WHERE player_id=enemy_player AND x_p=x AND y_p=y ;                              
+                                
+/*HIT LOOP*/                                       
+
+                                        IF (target_from_projection  IS NULL)THEN 
+                                        BEGIN 
+                                                SELECT CONCAT('Message: ',miss_cell);
+                                                UPDATE targets                                                                        /*elegxoi gia an xtipise ploio*/
+                                                SET target_status='miss'
+                                                WHERE player_id=p_id AND target_id=t_id AND x_t=x AND y_t=y; 
+                                                UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
+                                                
+                                        END; 
+
+                                        ELSE    
+                                        BEGIN
+                                                SELECT CONCAT('Message: ', hit_cell);
+                                                UPDATE targets
+                                                SET target_status='hit'
+                                                WHERE player_id=p_id AND target_id=t_id AND x_t=x AND y_t=y; 
+
+                                                UPDATE projection
+                                                SET cell_status=NULL 
+                                                WHERE player_id=enemy_player AND x_p=x AND y_p=y;
+
+                                                SELECT COUNT(cell_status) INTO win_check
+                                                FROM projection
+                                                WHERE player_id=enemy_player ;
+
+                                                IF (win_check=0)THEN    
+                                                        
+                                                        BEGIN 
+                                                        CASE 
+                                                                WHEN p_id=1 THEN 
+                                                                                UPDATE game_status SET result='1st Player Wins!';
+                                                                                
+                                                                ELSE 
+                                                                        UPDATE game_status SET result='2nd Player Wins!';
+
+                                                        END CASE;
+                                                                                SELECT result INTO winner FROM game_status ;
+                                                        SELECT CONCAT('Message: ', winner);                                                 /*elegxos an o antipalos den exei allo ploio ara niki*/
+                                                        
+                                                        END;
+                                                 
+                                                
+                                                ELSE UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
+                                                END IF;
+
+                                        END; 
+                                        END IF;
+                              
+                         END;
+                END IF;
+         END//
+DELIMITER ;
 /*
 
 CALL set_piece(1,1,2,2,2,6);
