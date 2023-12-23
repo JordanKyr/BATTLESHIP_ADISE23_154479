@@ -6,11 +6,13 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 $input = json_decode(file_get_contents('php://input'),true);
 
+echo "Hello world!<br>";
+
 print_r($_SERVER);
 exit;
 
 switch ($r=array_shift($request)) {
-    case 'battleship' :
+    case 'projection' :
         switch ($b=array_shift($request)) {
             case '':
             case null: handle_board($method);break;
@@ -23,5 +25,5 @@ switch ($r=array_shift($request)) {
         header("HTTP/1.1 404 Not Found");
         exit;
 
-
+    }
 ?>
