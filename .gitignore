@@ -2,6 +2,7 @@
 
 /vendor/*
 /config/app.php
+/lib/db_upass.php
 
 /tmp/cache/models/*
 !/tmp/cache/models/empty
