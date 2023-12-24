@@ -24,9 +24,6 @@ function reset_game() {
     $sql='call clean_all()';
     $mysqli->query($sql);
     show_projection();
-
-    print "reseted";
-
 }
 
 ?>

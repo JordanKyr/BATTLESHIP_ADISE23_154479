@@ -1,0 +1,8 @@
+#game_table TD {width: 3em; height:3em;border:3px solid rgb(227, 247, 255); text-align:center; }
+#game_table {border-collapse: collapse; background-color:#42bff5  ;}
+
+TD.square_1_1 {background-color:#ff0000;}
+TD.W_square {background-color:#c41717;}
+IMG.piece {width: 2.1em; height:2.8em;}
+TD.pmove {border:3px solid blue; background-color:yellow;}
+TD.tomove {border:3px solid blue; background-color:blue;}
