@@ -1,5 +1,11 @@
-#game_table TD {width: 3em; height:3em;border:3px solid rgb(227, 247, 255); text-align:center; }
-#game_table {border-collapse: collapse; background-color:#42bff5  ;}
+#game_table TD {width: 3em; height:3em;border:3px solid #c2cff8; text-align:center; }
+#game_table {border-collapse: collapse; background-color:#8798bd  ;}
+#table_target TD {width: 3em; height:3em;border:3px solid #000000; text-align:center; }
+#table_target {border-collapse: collapse; background-color:#9da6b9  ;}
+
+img {
+    width: 3em; height:3em;
+  }
 
 TD.square_1_1 {background-color:#ff0000;}
 TD.W_square {background-color:#c41717;}
