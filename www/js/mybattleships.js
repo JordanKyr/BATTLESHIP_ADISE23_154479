@@ -1,7 +1,13 @@
+//global metavlites
+var me={};
+var game_status={};
+
+
 $( function() {
     draw_start_table();
     fill_projection();
     $('#projection_reset').click(reset_projection);
+    $('#battleships_login').click(login_to_game);
 
 });
 
@@ -40,6 +46,9 @@ function draw_start_table() {
 
 
 }
+
+
+
 
 function reset_projection(){
     $.ajax({
@@ -140,4 +149,40 @@ function fill_projection_by_data(data){
         }
     }
 
+}
+
+
+function login_to_game() {
+	if($('#username').val()=='') {
+		alert('You have to set a username');
+		return;
+	}
+	var p_id = $('#player_id').val();
+	draw_start_table(p_id);
+	fill_projection();
+	
+	$.ajax({url: "battleships.php/players/"+p_id, 
+			method: 'PUT',
+			dataType: "json",
+			contentType: 'application/json',
+			data: JSON.stringify( {username: $('#username').val(), player_id: p_id}),
+			success: login_result,
+			error: login_error});
+}
+
+function login_result(data) {
+	me = data[0];
+	$('#game_initializer').hide();
+	update_info();
+	//game_status_update();
+}
+
+function login_error(data,y,z,c) {
+	var x = data.responseJSON;
+	alert(x.errormesg);
+}
+
+function update_info(){
+	$('#game_info').html("I am Player: "+me.player_id+", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.game_stat+', '+ game_status.p_turn+' must play now.');
+	
 }

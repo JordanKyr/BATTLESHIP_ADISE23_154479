@@ -69,8 +69,8 @@ INSERT INTO game_status_clean(game_stat,p_turn,result,last_change)  VALUE       
 ('not active','1', NULL, NULL); 
 
 INSERT INTO players_clean(player_id,username,token,last_action) VALUES                        /*eisagogi paikton ston pinaka, to paixnidi paizetai apo 2 paiktes*/
-                (1,'1st',NULL,NULL), 
-                (2, '2nd',NULL,NULL);
+                (1,NULL,NULL,NULL), 
+                (2, NULL ,NULL,NULL);
 
 
 CREATE TABLE ships_clean (                                                                    /*pinakas karavion, ton onomaton kai ton xaraktiristikon tous*/
@@ -662,8 +662,8 @@ CREATE TABLE IF NOT EXISTS `players` (
 
 -- Dumping data for table battleships.players: ~2 rows (approximately)
 INSERT INTO `players` (`player_id`, `username`, `token`, `last_action`) VALUES
-	(1, '1st', NULL, NULL),
-	(2, '2nd', NULL, NULL);
+	(1, NULL, NULL, NULL),
+	(2, NULL, NULL, NULL);
 
 -- Dumping structure for table battleships.projection
 CREATE TABLE IF NOT EXISTS `projection` (
