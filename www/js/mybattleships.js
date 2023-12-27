@@ -161,8 +161,10 @@ function login_to_game() {
 	draw_start_table(p_id);
 	fill_projection();
 	
-	$.ajax({url: "battleships.php/players/"+p_id, 
-			method: 'PUT',
+	$.ajax({
+            type: 'PUT',
+            url: "battleships.php/players/"+p_id, 
+			
 			dataType: "json",
 			contentType: 'application/json',
 			data: JSON.stringify( {username: $('#username').val(), player_id: p_id}),
