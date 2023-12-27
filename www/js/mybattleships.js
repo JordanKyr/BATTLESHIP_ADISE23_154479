@@ -179,7 +179,7 @@ function login_result(data) {
 
 function login_error(data,y,z,c) {
 	var x = data.responseJSON;
-	alert(x.errormesg);
+	//alert(x.errormesg);
 }
 
 function update_info(){
