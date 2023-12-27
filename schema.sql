@@ -15,6 +15,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 -- Dumping structure for procedure battleships.clean_all
+DROP PROCEDURE IF EXISTS `clean_all`;
 DELIMITER //
 CREATE PROCEDURE `clean_all`()
 BEGIN 
@@ -553,6 +554,7 @@ DROP TABLE IF EXISTS players_clean;
 DELIMITER ;
 
 -- Dumping structure for table battleships.game_status
+DROP TABLE IF EXISTS `game_status`;
 CREATE TABLE IF NOT EXISTS `game_status` (
   `game_id` tinyint(1) NOT NULL AUTO_INCREMENT,
   `game_stat` enum('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
@@ -567,6 +569,7 @@ INSERT INTO `game_status` (`game_id`, `game_stat`, `p_turn`, `result`, `last_cha
 	(1, 'not active', NULL, NULL, NULL);
 
 -- Dumping structure for procedure battleships.hit_piece
+DROP PROCEDURE IF EXISTS `hit_piece`;
 DELIMITER //
 CREATE PROCEDURE `hit_piece`(p_id tinyint, t_id tinyint, x tinyint, y tinyint)
 BEGIN 
@@ -652,6 +655,7 @@ BEGIN
 DELIMITER ;
 
 -- Dumping structure for table battleships.players
+DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `player_id` tinyint(1) NOT NULL,
   `username` varchar(20) DEFAULT NULL,
@@ -666,6 +670,7 @@ INSERT INTO `players` (`player_id`, `username`, `token`, `last_action`) VALUES
 	(2, NULL, NULL, NULL);
 
 -- Dumping structure for table battleships.projection
+DROP TABLE IF EXISTS `projection`;
 CREATE TABLE IF NOT EXISTS `projection` (
   `projection_id` tinyint(1) NOT NULL,
   `player_id` tinyint(1) DEFAULT NULL,
@@ -881,6 +886,7 @@ INSERT INTO `projection` (`projection_id`, `player_id`, `x_p`, `y_p`, `cell_stat
 	(2, 2, 10, 10, NULL);
 
 -- Dumping structure for procedure battleships.set_piece
+DROP PROCEDURE IF EXISTS `set_piece`;
 DELIMITER //
 CREATE PROCEDURE `set_piece`(s_id tinyint, p_id tinyint, start_x tinyint, end_x tinyint, start_y tinyint, end_y tinyint)
 BEGIN 
@@ -949,6 +955,7 @@ BEGIN
 DELIMITER ;
 
 -- Dumping structure for table battleships.ships
+DROP TABLE IF EXISTS `ships`;
 CREATE TABLE IF NOT EXISTS `ships` (
   `ship_id` tinyint(1) NOT NULL AUTO_INCREMENT,
   `player_id` tinyint(1) DEFAULT NULL,
@@ -977,6 +984,7 @@ INSERT INTO `ships` (`ship_id`, `player_id`, `ship_name`, `ship_size`, `start_ro
 	(10, 2, 'Niki', 2, NULL, NULL, NULL, NULL);
 
 -- Dumping structure for table battleships.targets
+DROP TABLE IF EXISTS `targets`;
 CREATE TABLE IF NOT EXISTS `targets` (
   `target_id` tinyint(1) NOT NULL,
   `player_id` tinyint(1) DEFAULT NULL,
