@@ -174,7 +174,7 @@ function login_result(data) {
 	me = data[0];
 	$('#game_initializer').hide();
 	update_info();
-	//game_status_update();
+	game_status_update();
 }
 
 function login_error(data,y,z,c) {
@@ -185,4 +185,28 @@ function login_error(data,y,z,c) {
 function update_info(){
 	$('#game_info').html("I am Player: "+me.player_id+", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.game_stat+', '+ game_status.p_turn+' must play now.');
 	
+}
+
+
+
+
+
+function game_status_update() {
+	$.ajax({url: "battleships.php/game_status/", success: update_status });
+}
+
+function update_status(data) {
+	game_status=data[0];
+	update_info();
+	// if(game_status.p_turn==me.player_id &&  me.player_id!=null) {
+	// 	x=0;
+	// 	// do play
+	// 	$('#move_div').show(1000);
+	// 	setTimeout(function() { game_status_update();}, 15000);
+	// } else {
+	// 	// must wait for something
+	// 	$('#move_div').hide(1000);
+	// 	setTimeout(function() { game_status_update();}, 4000);
+	// }
+ 	
 }

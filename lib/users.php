@@ -49,7 +49,7 @@ function set_user($b, $input){
 
 
 	
-	//update_game_status();
+	update_game_status();
 	$sql = 'select * from players where player_id=?';
 	$st = $mysqli->prepare($sql);
 	$st->bind_param('s',$b);

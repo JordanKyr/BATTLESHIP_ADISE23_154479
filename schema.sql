@@ -65,8 +65,8 @@ CREATE TABLE game_status_clean (                                                
         PRIMARY KEY(game_id)
 );
 
-INSERT INTO game_status_clean(game_stat,p_turn,result,last_change)  VALUE                     /*arxikopoiisi status paixnidiou*/
-('not active','1', NULL, NULL); 
+INSERT INTO game_status_clean(game_id, game_stat, p_turn, result, last_change) VALUES
+	(1, 'not active', NULL, NULL, NULL);
 
 INSERT INTO players_clean(player_id,username,token,last_action) VALUES                        /*eisagogi paikton ston pinaka, to paixnidi paizetai apo 2 paiktes*/
                 (1,NULL,NULL,NULL), 
@@ -564,7 +564,7 @@ CREATE TABLE IF NOT EXISTS `game_status` (
 
 -- Dumping data for table battleships.game_status: ~1 rows (approximately)
 INSERT INTO `game_status` (`game_id`, `game_stat`, `p_turn`, `result`, `last_change`) VALUES
-	(1, 'not active', '1', NULL, NULL);
+	(1, 'not active', NULL, NULL, NULL);
 
 -- Dumping structure for procedure battleships.hit_piece
 DELIMITER //
