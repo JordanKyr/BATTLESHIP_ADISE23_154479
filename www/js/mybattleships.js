@@ -1,4 +1,5 @@
 //global metavlites
+
 var me={};
 var game_status={};
 
@@ -6,11 +7,83 @@ var game_status={};
 $( function() {
     draw_start_table();
     fill_projection();
+
+
+    draw_ship_info_table();
+    fill_ships();
+    
+    $('#do_place').click( do_place);
+
+
     $('#projection_reset').click(reset_projection);
     $('#battleships_login').click(login_to_game);
+    $('#place_div').hide();
+
 
 });
 
+function draw_ship_info_table(){
+    var t3='<table id="table_ship_info">';
+    for(var i=1; i<=5; i++) {
+        
+        t3 += '<tr>';
+        for(var j=1; j<=3; j++) {
+            t3 += '<td class="table_ship_inform" id="square_info_'+i+'_'+j+'">'+i+','+j+'</td>';
+        }
+        t3+='</tr>';
+
+    }
+    t3+='</table>';
+    $('#ships_info').html(t3);
+
+    $('#square_info_1_1').html('<img src="./images/carrier.png" alt="hit_image" ></img>');
+    $('#square_info_2_1').html('<img src="./images/battleship.png" alt="hit_image" ></img>');
+    $('#square_info_3_1').html('<img src="./images/cruiser.png" alt="hit_image" ></img>');
+    $('#square_info_4_1').html('<img src="./images/submarine.png" alt="hit_image" ></img>');
+    $('#square_info_5_1').html('<img src="./images/destroyer.png" alt="hit_image" ></img>');
+
+
+}
+
+
+function fill_ships(){
+    $.ajax({
+        type: 'GET',
+        url: "battleships.php/ships/",
+        success: fill_ships_by_data  
+       
+      });
+
+}
+
+
+function fill_ships_by_data(data){
+
+
+var i=1;
+    for(var j=0; j<5; j++ ){
+     var ship_info=data[j];
+
+
+
+
+
+                    var id = '#square_info_' + i + '_2';
+                   
+                    $(id).html(ship_info.ship_name);
+
+                    id='#square_info_'+ i +'_3';
+                    $(id).html(ship_info.ship_size + ' spots' );
+
+i++;
+
+
+
+
+                }
+
+            
+}
 
 
 function draw_start_table() {
@@ -181,7 +254,7 @@ function login_result(data) {
 
 function login_error(data,y,z,c) {
 	var x = data.responseJSON;
-	//alert(x.errormesg);
+	alert(x.errormesg);
 }
 
 function update_info(){
@@ -200,15 +273,36 @@ function game_status_update() {
 function update_status(data) {
 	game_status=data[0];
 	update_info();
-	// if(game_status.p_turn==me.player_id &&  me.player_id!=null) {
-	// 	x=0;
-	// 	// do play
-	// 	$('#move_div').show(1000);
-	// 	setTimeout(function() { game_status_update();}, 15000);
-	// } else {
-	// 	// must wait for something
-	// 	$('#move_div').hide(1000);
-	// 	setTimeout(function() { game_status_update();}, 4000);
-	// }
+	if(game_status.p_turn==me.player_id &&  me.player_id!=null) {
+		x=0;
+		// do play
+		$('#place_div').show(1000);
+		setTimeout(function() { game_status_update();}, 15000);
+	} else {
+		// must wait for something
+		$('#place_div').hide(1000);
+		setTimeout(function() { game_status_update();}, 4000);
+	}
  	
+}
+
+
+
+
+function do_place() {
+	var s = $('#place_ship').val();
+	
+	var a = s.trim().split(/[ ]+/);
+	if(a.length!=5) {
+		alert('Must give a name and 4 numbers');
+		return;
+	}
+	$.ajax({url: "chess.php/board/piece/"+a[0]+'/'+a[1], 
+			method: 'PUT',
+			dataType: "json",
+			contentType: 'application/json',
+			data: JSON.stringify( {x: a[2], y: a[3]}),
+			success: move_result,
+			error: login_error});
+	
 }

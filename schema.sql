@@ -58,7 +58,7 @@ CREATE TABLE projection_clean (                                       /*pinakas 
 
 CREATE TABLE game_status_clean (                                                                                      /*pinakas katastasis paixnidiou*/
        game_id tinyint(1) NOT NULL AUTO_INCREMENT,
-        game_stat ENUM('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
+        game_stat ENUM('not active','initialized','started', 'ships_placed', 'ended','aborded') NOT NULL DEFAULT 'not active',
         p_turn ENUM('1','2') DEFAULT NULL,
         result ENUM('1st Player Wins!','2nd Player Wins!') DEFAULT NULL,
         last_change TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -93,16 +93,17 @@ CREATE TABLE ships_clean (                                                      
 );
 
 INSERT INTO ships_clean(player_id,ship_name,ship_size,start_row,end_row,start_col,end_col) VALUES             /*arxikopoisi pinaka ploion*/
-                (1, "Carrier", 5 , NULL, NULL, NULL,NULL ),
-                (2, "Carrier", 5 , NULL, NULL, NULL,NULL),
-                (1, "Battleship", 4 , NULL, NULL, NULL,NULL ),
-                (2, "Battleship", 4 , NULL, NULL, NULL,NULL ),
-                (1, "Cruiser", 3 , NULL, NULL, NULL,NULL ),
-                (2, "Cruiser", 3 , NULL, NULL, NULL,NULL ),
-                (1, "Submarine", 3 , NULL, NULL, NULL,NULL ),
-                (2, "Submarine", 3 , NULL, NULL, NULL,NULL ),
-                (1, "Niki", 2 , NULL, NULL, NULL,NULL ),
-                (2, "Niki", 2 , NULL, NULL, NULL,NULL );
+      	(1, 1, 'Carrier', 5, NULL, NULL, NULL, NULL),
+	(2, 1, 'Battleship', 4, NULL, NULL, NULL, NULL),
+	(3, 1, 'Cruiser', 3, NULL, NULL, NULL, NULL),
+	(4, 1, 'Submarine', 3, NULL, NULL, NULL, NULL),
+	(5, 1, 'Destroyer', 2, NULL, NULL, NULL, NULL),
+
+	(6, 2, 'Carrier', 5, NULL, NULL, NULL, NULL),
+	(7, 2, 'Battleship', 4, NULL, NULL, NULL, NULL),
+	(8, 2, 'Cruiser', 3, NULL, NULL, NULL, NULL),
+	(9, 2, 'Submarine', 3, NULL, NULL, NULL, NULL),
+	(10, 2, 'Destroyer', 2, NULL, NULL, NULL, NULL);
 
                 
                                                                                          /*pinakas stoxon*/
@@ -557,7 +558,7 @@ DELIMITER ;
 DROP TABLE IF EXISTS `game_status`;
 CREATE TABLE IF NOT EXISTS `game_status` (
   `game_id` tinyint(1) NOT NULL AUTO_INCREMENT,
-  `game_stat` enum('not active','initialized','started','ended','aborded') NOT NULL DEFAULT 'not active',
+  `game_stat` enum('not active','initialized','started','ships_placed','ended','aborded') NOT NULL DEFAULT 'not active',
   `p_turn` enum('1','2') DEFAULT NULL,
   `result` enum('1st Player Wins!','2nd Player Wins!') DEFAULT NULL,
   `last_change` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -973,15 +974,16 @@ CREATE TABLE IF NOT EXISTS `ships` (
 -- Dumping data for table battleships.ships: ~10 rows (approximately)
 INSERT INTO `ships` (`ship_id`, `player_id`, `ship_name`, `ship_size`, `start_row`, `end_row`, `start_col`, `end_col`) VALUES
 	(1, 1, 'Carrier', 5, NULL, NULL, NULL, NULL),
-	(2, 2, 'Carrier', 5, NULL, NULL, NULL, NULL),
-	(3, 1, 'Battleship', 4, NULL, NULL, NULL, NULL),
-	(4, 2, 'Battleship', 4, NULL, NULL, NULL, NULL),
-	(5, 1, 'Cruiser', 3, NULL, NULL, NULL, NULL),
-	(6, 2, 'Cruiser', 3, NULL, NULL, NULL, NULL),
-	(7, 1, 'Submarine', 3, NULL, NULL, NULL, NULL),
-	(8, 2, 'Submarine', 3, NULL, NULL, NULL, NULL),
-	(9, 1, 'Niki', 2, NULL, NULL, NULL, NULL),
-	(10, 2, 'Niki', 2, NULL, NULL, NULL, NULL);
+	(2, 1, 'Battleship', 4, NULL, NULL, NULL, NULL),
+	(3, 1, 'Cruiser', 3, NULL, NULL, NULL, NULL),
+	(4, 1, 'Submarine', 3, NULL, NULL, NULL, NULL),
+	(5, 1, 'Destroyer', 2, NULL, NULL, NULL, NULL),
+
+	(6, 2, 'Carrier', 5, NULL, NULL, NULL, NULL),
+	(7, 2, 'Battleship', 4, NULL, NULL, NULL, NULL),
+	(8, 2, 'Cruiser', 3, NULL, NULL, NULL, NULL),
+	(9, 2, 'Submarine', 3, NULL, NULL, NULL, NULL),
+	(10, 2, 'Destroyer', 2, NULL, NULL, NULL, NULL);
 
 -- Dumping structure for table battleships.targets
 DROP TABLE IF EXISTS `targets`;

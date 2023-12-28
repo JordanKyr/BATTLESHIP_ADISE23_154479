@@ -1,10 +1,14 @@
-#game_table TD {width: 3em; height:3em;border:3px solid #c2cff8; text-align:center; }
+#game_table TD {width: 4em; height:4em;border:3px solid #c2cff8; text-align:center; }
 #game_table {border-collapse: collapse; background-color:#8798bd  ;}
-#table_target TD {width: 3em; height:3em;border:3px solid #000000; text-align:center; }
+#table_target TD {width: 4em; height:4em;border:3px solid #000000; text-align:center; }
 #table_target {border-collapse: collapse; background-color:#9da6b9  ;}
 
+
+#table_ship_info TD {width: 6em; height:6em;border:3px solid #000000; text-align:center; }
+#table_ship_info {border-collapse: collapse; background-color:#ffffff  ;}
+
 img {
-    width: 3em; height:3em;
+    width: 4em; height:4em;
   }
 
 TD.square_1_1 {background-color:#ff0000;}
@@ -12,3 +16,20 @@ TD.W_square {background-color:#c41717;}
 IMG.piece {width: 2.1em; height:2.8em;}
 TD.pmove {border:3px solid blue; background-color:yellow;}
 TD.tomove {border:3px solid blue; background-color:blue;}
+
+.flex-parent{
+  display: flex;
+  width: 100%;
+  gap:50px;
+}
+
+.projection{
+  flex: 1;
+  margin: 10px;
+  border: 2px solid blueviolet;
+}
+
+.ships_info:first-child {
+  margin-right: 20px;
+
+}

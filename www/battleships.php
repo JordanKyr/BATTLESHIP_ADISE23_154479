@@ -4,6 +4,7 @@ require_once "../lib/projection.php";
 require_once "../lib/dbconnect.php";
 require_once "../lib/game.php";
 require_once "../lib/users.php";
+require_once "../lib/ships.php";
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -37,7 +38,11 @@ switch ($r=array_shift($request)) {
     case 'players': handle_players($method, $request,$input);
 			    break;
 
-    
+        case 'ships': if(sizeof($request)==0) {handle_ships($method);}
+        else {header("HTTP/1.1 404 Not Found");}
+        break;
+
+
         default: 
         header("HTTP/1.1 404 Not Found");
         exit;
@@ -49,6 +54,8 @@ switch ($r=array_shift($request)) {
     function handle_projection($method) {
         if($method=='GET') {
                 show_projection();
+               
+
         } else if ($method=='POST') {
                 reset_game();
         } else {
@@ -65,6 +72,17 @@ switch ($r=array_shift($request)) {
         }
     }
 
+
+    function handle_ships($method) {
+
+        if($method=='GET') {
+            show_ships();
+        } else {
+            header('HTTP/1.1 405 Method Not Allowed');
+        }
+
+
+    }
 
     function handle_players($method, $p,$input) {
         switch ($b=array_shift($p)) {
