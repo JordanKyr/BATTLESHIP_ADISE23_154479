@@ -964,7 +964,7 @@ DELIMITER //
 
                 END IF; 
 
-                UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
+               
              
                 END//
 DELIMITER ;
@@ -980,6 +980,7 @@ CREATE TABLE IF NOT EXISTS `ships` (
   `end_row` tinyint(1) DEFAULT NULL,
   `start_col` tinyint(1) DEFAULT NULL,
   `end_col` tinyint(1) DEFAULT NULL,
+  
   PRIMARY KEY (`ship_id`),
   KEY `fk_type3` (`player_id`),
   CONSTRAINT `fk_type3` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE

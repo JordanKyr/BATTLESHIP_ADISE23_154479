@@ -55,7 +55,65 @@ function do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token){
 }
 
 function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
- do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token);
+
+
+        if($token==null || $token=='') {
+            header("HTTP/1.1 400 Bad Request");
+            print json_encode(['errormesg'=>"token is not set."]);
+            exit;
+        }
+
+        $player_no = current_player($token);
+        if($player_no==null ) {
+            header("HTTP/1.1 400 Bad Request");
+            print json_encode(['errormesg'=>"You are not a player of this game."]);
+            exit;
+        }
+        $status = read_status();
+        if($status['game_stat']!='started') {
+            header("HTTP/1.1 400 Bad Request");
+            print json_encode(['errormesg'=>"Game is not in action."]);
+            exit;
+        }
+        if($status['p_turn']!=$player_no) {
+            header("HTTP/1.1 400 Bad Request");
+            print json_encode(['errormesg'=>"It is not your turn."]);
+            exit;
+        }
+        
+
+
+
+        $placed_check = check_placed($s_name,$token);
+        if($placed_check != null){
+            header("HTTP/1.1 400 Bad Request");
+            print json_encode(['errormesg'=>"Ship is already placed."]);
+            exit;
+                                                                            //loop για να βαλει ο παικτης ολα τα πλοια του.
+        }
+        do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token);
+
+      //  $orig_board=read_board();
+       // $board=convert_board($orig_board);
+       // $n = add_valid_moves_to_piece($board,$color,$x,$y);
+        // if($n==0) {
+        //     header("HTTP/1.1 400 Bad Request");
+        //     print json_encode(['errormesg'=>"This piece cannot move."]);
+        //     exit;
+        // }
+        // foreach($board[$x][$y]['moves'] as $i=>$move) {
+        //     if($x2==$move['x'] && $y2==$move['y']) {
+              
+                // exit;
+        //     }
+        // }
+        // header("HTTP/1.1 400 Bad Request");
+        // print json_encode(['errormesg'=>"This move is illegal."]);
+        // exit;
+
+
+
+
 }
 
 
