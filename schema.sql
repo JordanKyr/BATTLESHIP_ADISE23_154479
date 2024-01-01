@@ -30,7 +30,7 @@ DROP TABLE IF EXISTS players_clean;
 CREATE TABLE players_clean (                          /* pinakas paikton*/
     player_id tinyint(1)  NOT NULL,
     username VARCHAR(20) DEFAULT NULL,
-    token VARCHAR(100) DEFAULT NULL,
+    token VARCHAR(255) DEFAULT NULL,
     last_action TIMESTAMP NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
     PRIMARY KEY(player_id)
 
@@ -44,6 +44,7 @@ CREATE TABLE projection_clean (                                       /*pinakas 
         y_p tinyint(1) NOT NULL,
         
         cell_status tinyint(1) DEFAULT NULL, 
+		ship_name VARCHAR(255) DEFAULT NULL, 
 
         PRIMARY KEY(projection_id,x_p,y_p),
 
@@ -77,7 +78,7 @@ INSERT INTO players_clean(player_id,username,token,last_action) VALUES          
 CREATE TABLE ships_clean (                                                                    /*pinakas karavion, ton onomaton kai ton xaraktiristikon tous*/
         ship_id tinyint(1) NOT NULL AUTO_INCREMENT,
         player_id tinyint(1) DEFAULT NULL,
-        ship_name VARCHAR(100) DEFAULT NULL,
+        ship_name VARCHAR(255) DEFAULT NULL,
         ship_size tinyint(1) DEFAULT NULL,
         start_row tinyint(1) DEFAULT NULL,
         end_row tinyint(1) DEFAULT NULL,
@@ -660,7 +661,7 @@ DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `player_id` tinyint(1) NOT NULL,
   `username` varchar(20) DEFAULT NULL,
-  `token` varchar(100) DEFAULT NULL,
+  `token` VARCHAR(255) DEFAULT NULL,
   `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -678,6 +679,7 @@ CREATE TABLE IF NOT EXISTS `projection` (
   `x_p` tinyint(1) NOT NULL,
   `y_p` tinyint(1) NOT NULL,
   `cell_status` tinyint(1) DEFAULT NULL,
+  ship_name VARCHAR(255) DEFAULT NULL, 
   PRIMARY KEY (`projection_id`,`x_p`,`y_p`),
   KEY `fk_type2` (`player_id`),
   CONSTRAINT `fk_type2` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -886,20 +888,32 @@ INSERT INTO `projection` (`projection_id`, `player_id`, `x_p`, `y_p`, `cell_stat
 	(2, 2, 10, 9, NULL),
 	(2, 2, 10, 10, NULL);
 
+
+
+
+
+
+
+
 -- Dumping structure for procedure battleships.set_piece
-DROP PROCEDURE IF EXISTS `set_piece`;
+DROP PROCEDURE IF EXISTS set_piece;
+
 DELIMITER //
-CREATE PROCEDURE `set_piece`(s_id tinyint, p_id tinyint, start_x tinyint, end_x tinyint, start_y tinyint, end_y tinyint)
-BEGIN 
-              DECLARE outofbounds, place_occupied VARCHAR(255);        
-              DECLARE c_stat,sh_size, count_x, count_y tinyint(1); 
+        CREATE PROCEDURE set_piece(s_name varchar(255), start_x tinyint,  start_y tinyint, end_x tinyint, end_y tinyint, p_token varchar(255))
+        BEGIN 
+              DECLARE outofbounds, place_occupied  VARCHAR(255);        
+              DECLARE c_stat, count_x, count_y, s_id, p_id tinyint(1); 
               SET c_stat=NULL ;
+			  SET s_id=NULL;
+			  SET p_id=NULL;
               SET count_x=1;
               SET count_y=1; 
 
-                SELECT ship_name INTO sh_size FROM ships
-                WHERE s_id=ship_id  ;                                             /*pairno to megethos toy ploioy*/
+			  SELECT player_id INTO p_id FROM players
+			  WHERE token=p_token;
 
+			  SELECT ship_id INTO s_id FROM ships 
+			  WHERE ship_name = s_name and player_id=p_id;
               
               SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
               WHERE  x_p=start_x AND y_p=start_y AND player_id=p_id;
@@ -932,13 +946,13 @@ BEGIN
 
 /*LOOP FILL*/        fill_rows_ship: WHILE count_x <= end_x AND start_x<>end_x DO
                 UPDATE projection
-                set cell_status=1 WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
+                set cell_status=1, ship_name=s_name WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
                 set count_x= count_x+1;
                 END WHILE fill_rows_ship;
 
 /*LOOP FILL*/        fill_cols_ship: WHILE count_y <= end_y AND start_y<>end_y DO
                 UPDATE projection
-                set cell_status=1 WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
+                set cell_status=1, ship_name=s_name WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
                 set count_y= count_y+1;     
                 END WHILE fill_cols_ship;           
 
@@ -960,7 +974,7 @@ DROP TABLE IF EXISTS `ships`;
 CREATE TABLE IF NOT EXISTS `ships` (
   `ship_id` tinyint(1) NOT NULL AUTO_INCREMENT,
   `player_id` tinyint(1) DEFAULT NULL,
-  `ship_name` varchar(100) DEFAULT NULL,
+  `ship_name` VARCHAR(255) DEFAULT NULL,
   `ship_size` tinyint(1) DEFAULT NULL,
   `start_row` tinyint(1) DEFAULT NULL,
   `end_row` tinyint(1) DEFAULT NULL,

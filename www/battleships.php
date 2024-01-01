@@ -15,18 +15,14 @@ $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
 $input = json_decode(file_get_contents('php://input'),true);
 
 
-
-
 switch ($r=array_shift($request)) {
+    
     case 'projection' :
         switch ($b=array_shift($request)) {
             case '':
             case null: handle_projection($method); 
                 break;
-            case 'projection_id': // handle_piece($method, $request[0],$request[1],$input); 
-                break;
-            case 'player_id': //handle_player($method, $request[0],$input);
-                 break;
+            
             default: header("HTTP/1.1 404 Not Found"); break;
         } break; 
         
@@ -38,16 +34,15 @@ switch ($r=array_shift($request)) {
     case 'players': handle_players($method, $request,$input);
 			    break;
 
-        case 'ships': if(sizeof($request)==0) {handle_ships($method);}
-        else {header("HTTP/1.1 404 Not Found");}
-        break;
-
-
-        default: 
-        header("HTTP/1.1 404 Not Found");
-        exit;
-
-    }
+    case 'ships': 
+            switch ($c=array_shift($request)) {
+                case '':
+                case null: handle_ships($method); 
+                    break;
+                case 'ship_name': handle_ship_name($method,$request[0],  $input);
+                    break;
+                default: header("HTTP/1.1 404 Not Found"); break; }
+        break;}
 
 
 
@@ -101,6 +96,16 @@ switch ($r=array_shift($request)) {
     }
 
  
+    function handle_ship_name($method,$ship_name, $input){
+   
+        if ($method=='PUT'){
+            place_ship($ship_name, $input['start_row'], $input['start_col'], $input['end_row'], $input['end_col'], $input['token']  );
+        }
+ 
+
+
+
+    }
     
 
 

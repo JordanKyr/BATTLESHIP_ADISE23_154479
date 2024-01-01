@@ -41,4 +41,22 @@ function reset_game() {
     show_projection();
 }
 
+
+function do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token){
+    global $mysqli;
+	$sql = 'call `set_piece`(?,?,?,?,?,?);';
+	$st = $mysqli->prepare($sql);
+	$st->bind_param('siiiis',$s_name,$x_start,$y_start,$x_end,$y_end,$token );
+	$st->execute();
+
+	show_projection();
+
+
+}
+
+function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
+ do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token);
+}
+
+
 ?>
