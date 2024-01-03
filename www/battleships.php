@@ -56,6 +56,7 @@ switch ($r=array_shift($request)) {
                     break;
                 case 'ship_name': handle_ship_name($method,$request[0], $input);
                     break;
+                case 'hit_ship': handle_hit_ship($method,$request[0],$request[1],$input); break;
                 default: header("HTTP/1.1 404 Not Found"); break; }
         break;}
 
@@ -139,6 +140,13 @@ function handle_placed_ships($method, $input){
 }
 
 
+function handle_hit_ship($method, $x, $y,$input){
+    if($method=='GET'){
+        hit_ship($x,$y,$input['token']);
+    }
+    else{
+        header('HTTP/1.1 405 Method Not Allowed');
+    }
 
-
+}
 ?>

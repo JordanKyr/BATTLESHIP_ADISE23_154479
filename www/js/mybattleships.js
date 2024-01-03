@@ -3,6 +3,7 @@
 var me={};
 var game_status={};
 var count_ships=0;
+var ships_placed_flag=0;
 
 $( function() {
     $('#battleships_login').click(login_to_game);
@@ -13,12 +14,14 @@ $( function() {
     fill_ships();
     
     
-    $('#do_place').click( do_place);
+    $('#do_place').click( do_place);     //κουμπί-μέθοδος για τοποθέτηση πλοίου
    
+    $('#do_hit').click( do_hit);         //κουμπί-μέθοδος για χτύπημα
 
     $('#projection_reset').click(reset_projection);
 
     $('#place_div').hide();
+    $('#hit_div').hide();
 
 
 });
@@ -166,7 +169,7 @@ function fill_projection_by_data(data){
     for(var y=0; y<projection_array.length; y++){
     
         var p = projection_array[y];
-        if(p.player_id==1 ){
+       
 
      let i=y;
 
@@ -193,7 +196,7 @@ function fill_projection_by_data(data){
             }else { $(id).html('');}
 
 
-        }
+        
         }
     }
     
@@ -201,11 +204,11 @@ function fill_projection_by_data(data){
     for(var y=0; y<targets_array.length; y++){
     
         var t = targets_array[y];
-        if(t.target_id==2 ){
+        
 
      let i=y;
 
-        for( ; i<200; i++)
+        for( ; i<100; i++)
         {
             
             var o = targets_array[i];
@@ -234,7 +237,7 @@ function fill_projection_by_data(data){
 
            
 
-        }
+        
         }
     }
     
@@ -294,9 +297,19 @@ function game_status_update() {
 function update_status(data) {
 	game_status=data[0];
 	update_info();
-    if(game_status.game_stat=='ships_placed') { alert("all ships are placed for both players;")} 
+    
+    if(game_status.game_stat=='ships_placed' && ships_placed_flag==0)
+    {
+            alert("Both Players Placed all the Ships");                                             
+            ships_placed_flag=1;
+           
+    }else if(game_status.game_stat=='ships_placed' && ships_placed_flag==1 && game_status.p_turn==me.player_id){
+        
+        $('#hit_div').show(500);
+    }
+    else {   $('#hit_div').hide(500);}
 
-	if(game_status.p_turn==me.player_id &&  me.player_id!=null) {
+	if(game_status.p_turn==me.player_id &&  me.player_id!=null && ships_placed_flag==0) {
 		x=0;
 		// do play
 		$('#place_div').show(500);
@@ -306,7 +319,9 @@ function update_status(data) {
 		$('#place_div').hide(500);
 		setTimeout(function() { game_status_update();}, 4000);
 	}
- 	
+    
+    
+
 }
 
 
@@ -357,4 +372,32 @@ function move_result(data)
 
 
 
+function do_hit(){                                  //μέθοδος για έναρξη διαδικασίας χτυπήματος
+    var s = $('#hit_ship').val();                      
+    var a = s.trim().split(/[ ]+/);
+                                                        //έλεγχος στοιχείων που έδωσε ο χρήστης, έλεγχος για x και y
+    if(a.length!=2) {
+        alert('Must give two coordinates X & Y');
+        return;
+    }
 
+    $.ajax({url: "battleships.php/ships/hit_ship/"+a[0]+'/'+a[1],           //ajax call για να στείλω request τα input που έδωσε ο χρήστης
+                            type: 'GET',
+                            dataType: "json",
+                            contentType: 'application/json',
+                            //data: JSON.stringify( {start_row: a[1], start_col: a[2], end_row: a[3], end_col: a[4]}),
+                            headers: {"X-Token": me.token},
+                            success: hit_result,
+                            error: login_error});
+                    
+
+
+}
+
+function hit_result(data)
+{
+
+
+    fill_projection_by_data(data);
+  //  update_status(data);
+}

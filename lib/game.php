@@ -104,16 +104,20 @@ function placed_ships($token){
 	}
 	else {
 
-			$new_status='placed_ships';
+			$new_status='ships_placed';
 
 			$sql = 'update game_status set game_stat=?';
 			$st = $mysqli->prepare($sql);
 			$st->bind_param('s',$new_status);
 			$st->execute();
 
+			
 			next_player();
+
 	}
 
+	show_game_status();
+  
 
 }
 

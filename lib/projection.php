@@ -5,28 +5,30 @@
 function show_projection($token) {
     global $mysqli;
 
-    $test=1;
-    // $sql='select player_id as pid from players where token=?';
-    // $st = $mysqli->prepare($sql);
-	// $st->bind_param('s',$test);
-    // $st->execute();
-	// $res = $st->get_result();
-    // //$pid= $res->fetch_assoc()['pid'];
+    
+    $sql='select player_id as pid from players where token=?';
+    $st = $mysqli->prepare($sql);
+	$st->bind_param('s',$token);
+    $st->execute();
+	$res = $st->get_result();
+    $plid= $res->fetch_assoc()['pid'];
 
                                                                     //παίρνω μόνο τα στοιχεία για τον έκαστο παίκτη
     $sql= 'select * from projection where player_id=?' ;
     $st = $mysqli->prepare($sql);
-    $st->bind_param('i',$test);
+    $st->bind_param('i',$plid);
     $st->execute();
     $res= $st->get_result();
 
     header('Content-type: application/json');
     $json_obj1 =json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
     
+    
+    $plid=($plid==1)?$plid=2 : $plid=1;
 
     $sql2= 'select * from targets where player_id=?';
     $st2 = $mysqli->prepare($sql2);
-    $st2->bind_param('i', $test);
+    $st2->bind_param('i', $plid);
     $st2->execute();
     $res2= $st2->get_result();
 
@@ -45,6 +47,7 @@ function reset_game($token) {
 
     $sql='call clean_all()';
     $mysqli->query($sql);
+    $token='1';
     show_projection($token);
 }
 
@@ -92,7 +95,7 @@ function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
         
         
 
-        $placed_check = check_placed($s_name,$token);
+        $placed_check = check_placed($s_name,$token);                           //έλεγχος αν ο παίκτης έχει τοποθετήσει το πλοίο ήδη
             if($placed_check != null){
                     header("HTTP/1.1 400 Bad Request");
                     print json_encode(['errormesg'=>"Ship is already placed."]);    
@@ -120,9 +123,69 @@ function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
         // print json_encode(['errormesg'=>"This move is illegal."]);
         // exit;
 
+function hit_ship($x,$y,$token){
+   
+    if($token==null || $token=='') {
+        header("HTTP/1.1 400 Bad Request");
+        print json_encode(['errormesg'=>"token is not set."]);
+        exit;
+    }
+
+    $player_no = current_player($token);
+    if($player_no==null ) {
+        header("HTTP/1.1 400 Bad Request");
+        print json_encode(['errormesg'=>"You are not a player of this game."]);
+        exit;
+    }
+    $status = read_status();
+    if($status['game_stat']!='ships_placed') {
+        header("HTTP/1.1 400 Bad Request");
+        print json_encode(['errormesg'=>"Ships are not placed."]);
+        exit;
+    }
+    if($status['p_turn']!=$player_no) {
+        header("HTTP/1.1 400 Bad Request");
+        print json_encode(['errormesg'=>"It is not your turn."]);
+        exit;
+    }
+    
+    $hit_check = check_hit($x,$y,$token);   
+    
+                                        
+                                                    //έλεγχος αν ο παίκτης έχει τοποθετήσει το πλοίο ήδη
+    if($hit_check != 'not_specified'){
+            header("HTTP/1.1 400 Bad Request");
+            print json_encode(['errormesg'=>"Coordinates already used."]);    
+            exit;}
+       do_hit($x,$y,$token);                                                              //loop για να βαλει ο παικτης ολα τα πλοια του.
+
+       
+       $hit_check = check_hit($x,$y,$token);   
+       
+        if($hit_check!='hit'){
+
+            next_player();
+        }
+    
 
 
 
+}
+
+function do_hit($x,$y,$token){
+    
+    $test='sasasasasasa';
+    
+    global $mysqli;
+	$sql = 'call `hit_piece`(?,?,?);';
+	$st = $mysqli->prepare($sql);
+	$st->bind_param('iis',$x,$y,$token );
+	$st->execute();
+
+	show_projection($token);
+
+
+}
 
 
 

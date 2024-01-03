@@ -35,31 +35,19 @@ INSERT INTO `game_status` (`game_id`, `game_stat`, `p_turn`, `result`, `last_cha
 -- Dumping structure for procedure battleships.hit_piece
 DROP PROCEDURE IF EXISTS `hit_piece`;
 DELIMITER //
-CREATE PROCEDURE `hit_piece`(p_id tinyint, t_id tinyint, x tinyint, y tinyint)
+CREATE PROCEDURE `hit_piece`(x tinyint, y tinyint, p_token varchar(255))
 BEGIN 
-                DECLARE enemy_player, target_from_projection, win_check, turn_flag tinyint(1);
-                DECLARE miss_cell, outofbounds, hit_cell, win_game, player_turn, winner VARCHAR(255);
-                SET enemy_player=if(p_id=1, 2, 1);
+                DECLARE p_id, enemy_player, target_from_projection  tinyint(1);
+              	SET p_id=null;
+			   
+			   	SELECT player_id INTO p_id FROM players WHERE token=p_token;				/* παίρνω το id του παίκτη με βάση το token */
+			   
+			    SET enemy_player=if(p_id=1, 2, 1);					/* παίρνω το id του αντιπάλου για να ελέγξω τον πίνακα του*/
                
+			
 
                 SET target_from_projection=NULL;
-                SET miss_cell='Hit Missed, Cell was Empty.';                            
-                SET outofbounds='Ouf of Bounds.';
-                SET hit_cell='Hit!';
-                SET win_game='You Have Won the Game!';
-                SET win_check= 17;
-
-            /*    SET turn_flag=0; */
-             /*   SELECT p_turn_temp INTO player_turn FROM game_status;  pairno gia temp tin seira toy paikti poy paizei tora */
-                
-
-
-                IF (x < 1 OR x > 10 OR y < 1 OR y > 10 )THEN
-                SELECT CONCAT('ERROR: ', outofbounds) ;
-                
-                ELSE 
-                        BEGIN
-
+                                        
                                 SELECT cell_status INTO target_from_projection FROM projection
                                 WHERE player_id=enemy_player AND x_p=x AND y_p=y ;                              
                                 
@@ -67,54 +55,27 @@ BEGIN
 
                                         IF (target_from_projection  IS NULL)THEN 
                                         BEGIN 
-                                                SELECT CONCAT('Message: ',miss_cell);
+                                               
                                                 UPDATE targets                                                                        /*elegxoi gia an xtipise ploio*/
                                                 SET target_status='miss'
-                                                WHERE player_id=p_id AND target_id=t_id AND x_t=x AND y_t=y; 
-                                                UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
+                                                WHERE player_id=enemy_player AND x_t=x AND y_t=y; 
+                                               
                                                 
                                         END; 
 
                                         ELSE    
                                         BEGIN
-                                                SELECT CONCAT('Message: ', hit_cell);
+                                            
                                                 UPDATE targets
                                                 SET target_status='hit'
-                                                WHERE player_id=p_id AND target_id=t_id AND x_t=x AND y_t=y; 
+                                                WHERE player_id=enemy_player AND x_t=x AND y_t=y; 
 
-                                                UPDATE projection
-                                                SET cell_status=NULL 
-                                                WHERE player_id=enemy_player AND x_p=x AND y_p=y;
-
-                                                SELECT COUNT(cell_status) INTO win_check
-                                                FROM projection
-                                                WHERE player_id=enemy_player ;
-
-                                                IF (win_check=0)THEN    
-                                                        
-                                                        BEGIN 
-                                                        CASE 
-                                                                WHEN p_id=1 THEN 
-                                                                                UPDATE game_status SET result='1st Player Wins!';
-                                                                                
-                                                                ELSE 
-                                                                        UPDATE game_status SET result='2nd Player Wins!';
-
-                                                        END CASE;
-                                                                                SELECT result INTO winner FROM game_status ;
-                                                        SELECT CONCAT('Message: ', winner);                                                 /*elegxos an o antipalos den exei allo ploio ara niki*/
-                                                        
-                                                        END;
-                                                 
-                                                
-                                                ELSE UPDATE game_status set p_turn=if(p_turn='1','2','1'); 
-                                                END IF;
+                                     
 
                                         END; 
                                         END IF;
                               
-                         END;
-                END IF;
+                
          END//
 DELIMITER ;
 
@@ -363,7 +324,6 @@ DROP PROCEDURE IF EXISTS set_piece;
 DELIMITER //
         CREATE PROCEDURE set_piece(s_name varchar(255), start_x tinyint,  start_y tinyint, end_x tinyint, end_y tinyint, p_token varchar(255))
         BEGIN 
-              DECLARE outofbounds, place_occupied  VARCHAR(255);        
               DECLARE c_stat, count_x, count_y, s_id, p_id tinyint(1); 
               SET c_stat=NULL ;
 			  SET s_id=NULL;
@@ -393,28 +353,27 @@ DELIMITER //
                 END WHILE loop_check_cols_status;
                
                                                                                         /*elegxos gia lathos timon theseon ploion*/
-              SET outofbounds='Ouf of Bounds.';
-              SET place_occupied='Ship Already There.';  
-
-                IF (start_x < 1 OR start_x > 10 OR end_x < 1 OR end_x > 10 OR start_y < 1 OR start_y > 10 OR end_y < 1 OR end_y > 10 )THEN
-                SELECT CONCAT('ERROR: ', outofbounds) ;
-                ELSEIF (c_stat IS NOT NULL) THEN
-                SELECT CONCAT('ERROR: ', place_occupied);
-                
-                ELSE 
-                        BEGIN
+            
                 set count_x=start_x;
                 set count_y=start_y;
 
 /*LOOP FILL*/        fill_rows_ship: WHILE count_x <= end_x AND start_x<>end_x DO
                 UPDATE projection
                 set cell_status=1, ship_name=s_name WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
-                set count_x= count_x+1;
+                
+				UPDATE targets
+                set cell_status=1 WHERE player_id=p_id AND x_t=count_x and y_t=count_y;
+
+				set count_x= count_x+1;
                 END WHILE fill_rows_ship;
 
 /*LOOP FILL*/        fill_cols_ship: WHILE count_y <= end_y AND start_y<>end_y DO
                 UPDATE projection
                 set cell_status=1, ship_name=s_name WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
+				
+				UPDATE targets
+                set cell_status=1 WHERE player_id=p_id AND x_t=count_x and y_t=count_y;
+
                 set count_y= count_y+1;     
                 END WHILE fill_cols_ship;           
 
@@ -422,9 +381,9 @@ DELIMITER //
                 set start_row=start_x, end_row=end_x,start_col=start_y, end_col=end_y                                                 /*enimerosi thesis ploiou kai game status*/
                 where ship_id=s_id and player_id=p_id;
 
-               END;
+             
 
-                END IF; 
+               
 
                
              
@@ -470,6 +429,7 @@ CREATE TABLE IF NOT EXISTS `targets` (
   `target_status` enum('not_specified','hit','miss') DEFAULT 'not_specified',
   `x_t` tinyint(1) NOT NULL,
   `y_t` tinyint(1) NOT NULL,
+  `cell_status` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`target_id`,`x_t`,`y_t`),
   KEY `fk_type4` (`player_id`),
   CONSTRAINT `fk_type4` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -778,7 +738,7 @@ CREATE TABLE targets_clean(
 
         x_t tinyint(1) NOT NULL,
         y_t tinyint(1) NOT NULL,
-
+		cell_status tinyint(1) DEFAULT NULL,
         PRIMARY KEY(target_id, x_t, y_t),
 
         CONSTRAINT fk_type1clean 
