@@ -2,20 +2,22 @@
 
 var me={};
 var game_status={};
+var count_ships=0;
 
 $( function() {
-    draw_start_table();
-    fill_projection();
+    $('#battleships_login').click(login_to_game);
+
 
 
     draw_ship_info_table();
     fill_ships();
     
+    
     $('#do_place').click( do_place);
-
+   
 
     $('#projection_reset').click(reset_projection);
-    $('#battleships_login').click(login_to_game);
+
     $('#place_div').hide();
 
 
@@ -49,6 +51,7 @@ function fill_ships(){
     $.ajax({
         type: 'GET',
         url: "battleships.php/ships/",
+        headers: {"X-Token": me.token},
         success: fill_ships_by_data  
        
       });
@@ -122,6 +125,7 @@ function reset_projection(){
     $.ajax({
         type: 'POST',
         url: "battleships.php/projection/",
+        headers: {"X-Token": me.token},
         success: fill_projection_by_data  
        
       });
@@ -135,6 +139,7 @@ function fill_projection() {
     $.ajax({
             type: 'GET',
             url: "battleships.php/projection/",
+            headers: {"X-Token": me.token},
             success: fill_projection_by_data  
            
           }
@@ -149,11 +154,14 @@ function fill_projection_by_data(data){
 
     
 
-    var projection_array=data.slice(0,200);
+    var projection_array=data.slice(0,100);
                                          //pairno se enan pinaka ta projection kai se allon ta targets
 
-    var targets_array=data.slice(200,400);
-  
+    var targets_array=data.slice(100,200);
+
+
+
+
 
     for(var y=0; y<projection_array.length; y++){
     
@@ -229,6 +237,7 @@ function fill_projection_by_data(data){
         }
         }
     }
+    
 
 }
 
@@ -239,8 +248,8 @@ function login_to_game() {
 		return;
 	}
 	var p_id = $('#player_id').val();
-	draw_start_table(p_id);
-	fill_projection();
+	//draw_start_table(p_id);
+	//fill_projection();
 	
 	$.ajax({
             type: 'PUT',
@@ -249,12 +258,16 @@ function login_to_game() {
 			dataType: "json",
 			contentType: 'application/json',
 			data: JSON.stringify( {username: $('#username').val(), player_id: p_id}),
+            headers: {"X-Token": me.token},
 			success: login_result,
 			error: login_error});
 }
 
 function login_result(data) {
-	me = data[0];
+    me = data[0];
+    draw_start_table();
+    fill_projection();
+	
 	$('#game_initializer').hide();
 	update_info();
 	game_status_update();
@@ -275,12 +288,14 @@ function update_info(){
 
 
 function game_status_update() {
-	$.ajax({url: "battleships.php/game_status/", success: update_status });
+	$.ajax({url: "battleships.php/game_status/",headers: {"X-Token": me.token}, success: update_status });
 }
 
 function update_status(data) {
 	game_status=data[0];
 	update_info();
+    if(game_status.game_stat=='ships_placed') { alert("all ships are placed for both players;")} 
+
 	if(game_status.p_turn==me.player_id &&  me.player_id!=null) {
 		x=0;
 		// do play
@@ -298,28 +313,48 @@ function update_status(data) {
 
 
 function do_place() {
-	var s = $('#place_ship').val();
-	
-	var a = s.trim().split(/[ ]+/);
-    
-	if(a.length!=5) {
-		alert('Must give a ship name and 4 numbers');
-		return;
-	}
-	$.ajax({url: "battleships.php/ships/ship_name/"+a[0], 
-			type: 'PUT',
-			dataType: "json",
-			contentType: 'application/json',
-			data: JSON.stringify( {start_row: a[1], start_col: a[2], end_row: a[3], end_col: a[4], token: me.token}),
-			success: move_result,
-			error: login_error});
-	
-}
+        
+ if(count_ships<5){
+            var s = $('#place_ship').val();
+            
+            var a = s.trim().split(/[ ]+/);
+            
+                    if(a.length!=5) {
+                        alert('Must give a ship name and 4 numbers');
+                        return;
+                    }
+                    $.ajax({url: "battleships.php/ships/ship_name/"+a[0], 
+                            type: 'PUT',
+                            dataType: "json",
+                            contentType: 'application/json',
+                            data: JSON.stringify( {start_row: a[1], start_col: a[2], end_row: a[3], end_col: a[4]}),
+                            headers: {"X-Token": me.token},
+                            success: move_result,
+                            error: login_error});
+                    
+
+                }
+            }
+            
+     
 
 
 function move_result(data) 
 {
     fill_projection_by_data(data);
-  
+    count_ships++;
 
+    if(count_ships==5) {
+        alert('You have placed all your ships'); 
+        $('#place_div').hide(500);
+
+
+        $.ajax({url: "battleships.php/game_status/placed_ships",headers: {"X-Token": me.token}, success: update_status });
+
+        }
+ 
 }
+
+
+
+

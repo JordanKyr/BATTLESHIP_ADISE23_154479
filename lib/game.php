@@ -88,4 +88,53 @@ function read_status() {
 }
 
 
+function placed_ships($token){
+	
+															//μέθοδος για να αλλάξει η κατάσταση του παιχνιδιού σε ships_placed όταν έχουν τοποθετηθεί όλα τα πλοία
+	global $mysqli;											//και να ξεκινήσουν οι παίκτες τα χτυπήματα
+	$sql = 'select p_turn as p from game_status';					
+	$st = $mysqli->prepare($sql);
+	$st->execute();										 //ελέγχω το game status και το ποιός παίκτης παίζει
+	$res = $st->get_result();							//αν έχει καλέσει ο 2ος παίκητς την μέθοδο τότε σημαίνει ότι και οι δύο έχουν τοποθετήσει όλα τα πλοία τους.
+	$old_player = $res->fetch_assoc()['p'];
+
+	if($old_player=='1' ){
+		next_player();
+	
+	}
+	else {
+
+			$new_status='placed_ships';
+
+			$sql = 'update game_status set game_stat=?';
+			$st = $mysqli->prepare($sql);
+			$st->bind_param('s',$new_status);
+			$st->execute();
+
+			next_player();
+	}
+
+
+}
+
+function next_player(){
+	global $mysqli;										//μέθοδος για εναλλαγή παικτών
+	$sql = 'select p_turn as p from game_status';		//ελέγχω με select ποιός είναι ο παίκτης τώρα και με το update αλλάζω στον επόμενο
+	$st = $mysqli->prepare($sql);
+	$st->execute();
+	$res = $st->get_result();
+	$old_player = $res->fetch_assoc()['p'];
+
+	$new_player=($old_player=='1') ? '2' : '1';
+	$sql = 'update game_status set p_turn=?';
+	$st = $mysqli->prepare($sql);
+	$st->bind_param('s',$new_player);
+	$st->execute();
+
+
+
+	return($new_player);
+
+}
+
 ?>

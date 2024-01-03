@@ -12,25 +12,40 @@ $request = explode('/', trim($_SERVER['PATH_INFO'],'/'));
  // $request = explode('/', trim($_SERVER['SCRIPT_NAME'],'/')); 
 // Σε περίπτωση που τρέχουμε php–S 
 
-$input = json_decode(file_get_contents('php://input'),true);
+        $input = json_decode(file_get_contents('php://input'),true);
+        if($input==null) {
+            $input=[];
+        }
 
+
+        if(isset($_SERVER['HTTP_X_TOKEN'])) {
+            $input['token']=$_SERVER['HTTP_X_TOKEN'];
+        } else {
+            $input['token']='';
+        }
 
 switch ($r=array_shift($request)) {
     
     case 'projection' :
         switch ($b=array_shift($request)) {
             case '':
-            case null: handle_projection($method); 
+            case null: handle_projection($method,$input); 
                 break;
             
             default: header("HTTP/1.1 404 Not Found"); break;
         } break; 
         
     case 'game_status': 
-			if(sizeof($request)==0) {handle_game_status($method);}
-			else {header("HTTP/1.1 404 Not Found");}
-			break;
-	
+            switch ($u=array_shift($request)){ 
+                case '':
+                case null:        
+                        if(sizeof($request)==0) {handle_game_status($method);}
+                        else {header("HTTP/1.1 404 Not Found");}
+			            break;
+                case 'placed_ships': handle_placed_ships($method, $input);
+                    break;
+                default: header("HTTP/1.1 404 Not Found"); break;   
+            }break;
     case 'players': handle_players($method, $request,$input);
 			    break;
 
@@ -39,20 +54,20 @@ switch ($r=array_shift($request)) {
                 case '':
                 case null: handle_ships($method); 
                     break;
-                case 'ship_name': handle_ship_name($method,$request[0],  $input);
+                case 'ship_name': handle_ship_name($method,$request[0], $input);
                     break;
                 default: header("HTTP/1.1 404 Not Found"); break; }
         break;}
 
 
 
-    function handle_projection($method) {
+    function handle_projection($method,$input) {
         if($method=='GET') {
-                show_projection();
+                show_projection($input['token']);
                
 
         } else if ($method=='POST') {
-                reset_game();
+                reset_game($input['token']);
         } else {
             header('HTTP/1.1 405 Method Not Allowed');
         }
@@ -97,17 +112,31 @@ switch ($r=array_shift($request)) {
 
  
     function handle_ship_name($method,$ship_name, $input){
-   
+        
+        
+
         if ($method=='PUT'){
             place_ship($ship_name, $input['start_row'], $input['start_col'], $input['end_row'], $input['end_col'], $input['token']  );
+        } else {
+            header('HTTP/1.1 405 Method Not Allowed');
         }
- 
+      
 
-
+   
 
     }
     
+function handle_placed_ships($method, $input){
+    if($method=='GET'){
+        placed_ships($input['token']);
 
+
+    } 
+    else {
+            header('HTTP/1.1 405 Method Not Allowed');
+        }
+
+}
 
 
 
