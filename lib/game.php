@@ -141,4 +141,34 @@ function next_player(){
 
 }
 
+
+function g_winner($token){			//μέθοδος για την ενημέρωση του νικητή
+
+	global $mysqli;
+
+
+    $sql='select player_id as pid from players where token=?';		//παίρνω τον παίκτη
+    $st = $mysqli->prepare($sql);
+	$st->bind_param('s',$token);
+    $st->execute();
+	$res = $st->get_result();
+    $plid= $res->fetch_assoc()['pid'];
+	$new_status='ended';
+
+		if($plid==1)
+	{
+		$g_result='1st Player Wins!';							//ανάλογη ενημέρωση του game status για κάθε παίκτη
+		$sql='update game_status set game_stat=?, result=?';
+
+	}
+	else{
+		$g_result='2nd Player Wins!';
+		$sql='update game_status set game_stat=?, result=?';
+
+	}
+	$st = $mysqli->prepare($sql);
+	$st->bind_param('ss',$new_status, $g_result);
+	$st->execute();
+}
+
 ?>

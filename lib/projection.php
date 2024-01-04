@@ -92,37 +92,25 @@ function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
         }
         
 
-        
+        if(check_coord($s_name, $x_start, $y_start, $x_end, $y_end,$token )){
         
 
-        $placed_check = check_placed($s_name,$token);                           //έλεγχος αν ο παίκτης έχει τοποθετήσει το πλοίο ήδη
-            if($placed_check != null){
-                    header("HTTP/1.1 400 Bad Request");
-                    print json_encode(['errormesg'=>"Ship is already placed."]);    
-                    exit;}
-                                                                                    //loop για να βαλει ο παικτης ολα τα πλοια του.
-       
-                do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token);
-    
-               }
-      //  $orig_board=read_board();
-       // $board=convert_board($orig_board);
-       // $n = add_valid_moves_to_piece($board,$color,$x,$y);
-        // if($n==0) {
-        //     header("HTTP/1.1 400 Bad Request");
-        //     print json_encode(['errormesg'=>"This piece cannot move."]);
-        //     exit;
-        // }
-        // foreach($board[$x][$y]['moves'] as $i=>$move) {
-        //     if($x2==$move['x'] && $y2==$move['y']) {
-              
-                // exit;
-        //     }
-        // }
-        // header("HTTP/1.1 400 Bad Request");
-        // print json_encode(['errormesg'=>"This move is illegal."]);
-        // exit;
+            if(check_size($s_name, $x_start, $y_start, $x_end, $y_end)){            //αν δεν υπάρχει λάθος στις τιμές συντεταγμένων και το μέγεθος του πλοίου συνέχισε
 
+                        $placed_check = check_placed($s_name,$token);                           //έλεγχος αν ο παίκτης έχει τοποθετήσει το πλοίο ήδη
+                            if($placed_check != null){
+                                    header("HTTP/1.1 400 Bad Request");
+                                    print json_encode(['errormesg'=>"Ship is already placed."]);    
+                                    exit;}
+                                                                                                    //loop για να βαλει ο παικτης ολα τα πλοια του.
+                    
+                                do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token);
+
+                    
+                            }
+
+                        }
+ }
 function hit_ship($x,$y,$token){
    
     if($token==null || $token=='') {
@@ -149,6 +137,14 @@ function hit_ship($x,$y,$token){
         exit;
     }
     
+
+    if($x>10 || $x<1 || $y>10 || $y<1 ){          //εκτός ορίων
+        header("HTTP/1.1 400 Bad Request");
+        print json_encode(['errormesg'=>"Coordinates error: Out of Bounds."]);    
+        return(false);     
+        exit;}
+
+
     $hit_check = check_hit($x,$y,$token);   
     
                                         
@@ -163,10 +159,20 @@ function hit_ship($x,$y,$token){
        $hit_check = check_hit($x,$y,$token);   
        
         if($hit_check!='hit'){
-
+                                                //αν δεν έχει χτυπήσει στόχο, παίζει ο επόμενος αλλιώς συνεχίζει ο ίδιος παίκτης.
             next_player();
         }
-    
+        
+        $win_check = check_win($token);
+
+        if($win_check == 3 ){                       //αν έχει 17 χτυπήματα -> έχει χτυπήσει όλα τα πλοία του αντιπάλου -> νικάει
+       
+         g_winner($token);
+
+
+         exit;
+        
+        }
 
 
 
@@ -174,7 +180,7 @@ function hit_ship($x,$y,$token){
 
 function do_hit($x,$y,$token){
     
-    $test='sasasasasasa';
+                                        //καλώ την sql μέθοδο για το χτύπημα με τις συντεταγμένες και το token
     
     global $mysqli;
 	$sql = 'call `hit_piece`(?,?,?);';
@@ -182,8 +188,8 @@ function do_hit($x,$y,$token){
 	$st->bind_param('iis',$x,$y,$token );
 	$st->execute();
 
-	show_projection($token);
-
+	
+    show_projection($token);
 
 }
 

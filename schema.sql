@@ -328,8 +328,7 @@ DELIMITER //
               SET c_stat=NULL ;
 			  SET s_id=NULL;
 			  SET p_id=NULL;
-              SET count_x=1;
-              SET count_y=1; 
+           
 
 			  SELECT player_id INTO p_id FROM players
 			  WHERE token=p_token;
@@ -340,19 +339,8 @@ DELIMITER //
               SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
               WHERE  x_p=start_x AND y_p=start_y AND player_id=p_id;
                 
- /*LOOP CHECK*/       loop_check_rows_status: WHILE (c_stat IS NULL AND count_x < end_x-start_x-1)DO
-                SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
-                WHERE  x_p=start_x+count_x AND y_p=start_y AND player_id=p_id;
-                SET count_x= count_x +1 ;
-                END WHILE loop_check_rows_status;
 
- /*LOOP CHECK*/       loop_check_cols_status: WHILE (c_stat IS NULL AND count_y <=end_y-start_y-1 )DO
-                SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
-                WHERE  x_p=start_x AND y_p=start_y+count_y AND player_id=p_id;
-                SET count_y= count_y+1;
-                END WHILE loop_check_cols_status;
                
-                                                                                        /*elegxos gia lathos timon theseon ploion*/
             
                 set count_x=start_x;
                 set count_y=start_y;

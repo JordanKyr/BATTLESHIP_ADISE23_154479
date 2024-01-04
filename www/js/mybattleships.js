@@ -4,6 +4,7 @@ var me={};
 var game_status={};
 var count_ships=0;
 var ships_placed_flag=0;
+var game_ended_flag=0;
 
 $( function() {
     $('#battleships_login').click(login_to_game);
@@ -282,8 +283,13 @@ function login_error(data,y,z,c) {
 }
 
 function update_info(){
+    if(game_ended_flag==0){
 	$('#game_info').html("I am Player: "+me.player_id+", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.game_stat+', '+ game_status.p_turn+' must play now.');
-	
+    }
+    else{
+    $('#game_info').html("I am Player: "+me.player_id+", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.game_stat+', '+ game_status.result+'.');
+
+    }
 }
 
 
@@ -320,9 +326,18 @@ function update_status(data) {
 		setTimeout(function() { game_status_update();}, 4000);
 	}
     
+    if(game_status.p_turn==1 && game_status.game_stat=='ended' && game_ended_flag==0) {
+        alert("1st Player Wins! Game Ended");  
+        game_ended_flag=1; 
+        }
     
+        if(game_status.p_turn==2 && game_status.game_stat=='ended' && game_ended_flag==0 ) {
+            alert("2nd Player Wins! Game Ended"); 
+            game_ended_flag=1; 
+          }
+  }
 
-}
+
 
 
 
