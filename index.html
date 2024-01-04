@@ -1,9 +1,37 @@
+<script>
+ function startf(){   document.getElementById("photo").style.display='none';
+ }
+    function showPhoto(){
+        var x=document.getElementById("koumpi");
+        if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+
+  var x=document.getElementById("photo");
+        if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+
+
+
+
+}
+
+    
+    </script>
+
 <html>
 
 <head>
-    <body>
-
-        <img src="https://media.tenor.com/MYZgsN2TDJAAAAAC/this-is.gif" alt="fine">  
+    <body onload="startf()">
+<div id="photo">   
+  
+        <iframe src="https://giphy.com/embed/MDJ9IbxxvDUQM" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/cat-kisses-hugs-MDJ9IbxxvDUQM"></a></p> </div>
+    <div id="koumpi">   <button type="button" onclick="showPhoto()" style="height:200px;width:200px">Start!</button>              </div>    
     </body>
 
 </head>
