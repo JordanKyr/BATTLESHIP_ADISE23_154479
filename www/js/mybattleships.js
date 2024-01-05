@@ -11,9 +11,9 @@ $( function() {
 
 
 
-    draw_ship_info_table();
-    fill_ships();
-    
+   
+    $('#target_title').hide();
+    $('#fleet_title').hide();
     
     $('#do_place').click( do_place);     //κουμπί-μέθοδος για τοποθέτηση πλοίου
    
@@ -23,7 +23,7 @@ $( function() {
 
     $('#place_div').hide();
     $('#hit_div').hide();
-
+    
 
 });
 
@@ -126,6 +126,8 @@ function draw_start_table() {
 
 
 function reset_projection(){
+  
+    alert("Game Reseted!")
     $.ajax({
         type: 'POST',
         url: "battleships.php/projection/",
@@ -133,7 +135,17 @@ function reset_projection(){
         success: fill_projection_by_data  
        
       });
-
+      $('#game_initializer').show();
+      $('#place_div').hide();
+      $('#hit_div').hide();
+      $('#game_info').hide();
+      $('#projection').hide();
+      $('#target').hide();
+      $('#target_title').hide();
+      $('#fleet_title').hide();
+      $('#table_ship_info').hide();
+      
+  
 }
 
 
@@ -275,7 +287,19 @@ function login_result(data) {
 	$('#game_initializer').hide();
 	update_info();
 	game_status_update();
+    $('#game_info').show();
+    $('#projection').show();
+    $('#target').show();
+    $('#place_div').show();
+
+    draw_ship_info_table();
+    fill_ships();
+    $('table_ship_info').show();
+    
+    $('#target_title').show();
+    $('#fleet_title').show();
 }
+
 
 function login_error(data,y,z,c) {
 	var x = data.responseJSON;
@@ -283,6 +307,7 @@ function login_error(data,y,z,c) {
 }
 
 function update_info(){
+   
     if(game_ended_flag==0){
 	$('#game_info').html("I am Player: "+me.player_id+", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.game_stat+', '+ game_status.p_turn+' must play now.');
     }
