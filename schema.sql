@@ -554,7 +554,7 @@ DROP TABLE IF EXISTS players_clean;
 DELIMITER ;
 
 -- Dumping structure for table battleships.game_status
-DROP TABLE IF EXISTS `game_status`;								/*πίνακας κατάστασης παιχνιδιού*/
+DROP TABLE IF EXISTS `game_status`;
 CREATE TABLE IF NOT EXISTS `game_status` (
   `game_id` tinyint(1) NOT NULL AUTO_INCREMENT,
   `game_stat` enum('not active','initialized','started','ships_placed','ended','aborded') NOT NULL DEFAULT 'not active',
@@ -564,12 +564,12 @@ CREATE TABLE IF NOT EXISTS `game_status` (
   PRIMARY KEY (`game_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table battleships.game_status: ~1 rows (approximately)							/* εισαγωγή στοιχείων*/
+-- Dumping data for table battleships.game_status: ~1 rows (approximately)
 INSERT INTO `game_status` (`game_id`, `game_stat`, `p_turn`, `result`, `last_change`) VALUES
 	(1, 'not active', NULL, NULL, NULL);
 
 -- Dumping structure for procedure battleships.hit_piece
-DROP PROCEDURE IF EXISTS `hit_piece`;											/*μέθοδος για χτύπημα*/
+DROP PROCEDURE IF EXISTS `hit_piece`;
 DELIMITER //
 CREATE PROCEDURE `hit_piece`(x tinyint, y tinyint, p_token varchar(255))
 BEGIN 
@@ -616,7 +616,7 @@ BEGIN
 DELIMITER ;
 
 -- Dumping structure for table battleships.players
-DROP TABLE IF EXISTS `players`;								/*πίνακας παικτών*/
+DROP TABLE IF EXISTS `players`;
 CREATE TABLE IF NOT EXISTS `players` (
   `player_id` tinyint(1) NOT NULL,
   `username` varchar(20) DEFAULT NULL,
@@ -624,13 +624,13 @@ CREATE TABLE IF NOT EXISTS `players` (
   `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-																				/*εισαγωγή*/
+
 -- Dumping data for table battleships.players: ~2 rows (approximately)
 INSERT INTO `players` (`player_id`, `username`, `token`, `last_action`) VALUES
-	(1, NULL, NULL, NULL),	
+	(1, NULL, NULL, NULL),
 	(2, NULL, NULL, NULL);
 
--- Dumping structure for table battleships.projection					/*πίνακας board*/
+-- Dumping structure for table battleships.projection
 DROP TABLE IF EXISTS `projection`;
 CREATE TABLE IF NOT EXISTS `projection` (
   `projection_id` tinyint(1) NOT NULL,
@@ -644,7 +644,7 @@ CREATE TABLE IF NOT EXISTS `projection` (
   CONSTRAINT `fk_type2` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table battleships.projection: ~200 rows (approximately)								/*εισαγωγή*/
+-- Dumping data for table battleships.projection: ~200 rows (approximately)
 INSERT INTO `projection` (`projection_id`, `player_id`, `x_p`, `y_p`, `cell_status`, `ship_name`) VALUES
 	(1, 1, 1, 1, NULL, NULL),
 	(1, 1, 1, 2, NULL, NULL),
@@ -848,7 +848,7 @@ INSERT INTO `projection` (`projection_id`, `player_id`, `x_p`, `y_p`, `cell_stat
 	(2, 2, 10, 10, NULL, NULL);
 
 -- Dumping structure for procedure battleships.set_piece
-DROP PROCEDURE IF EXISTS `set_piece`;							/*μέθοδος τοποθέτησης πλοίων*/
+DROP PROCEDURE IF EXISTS `set_piece`;
 DELIMITER //
 CREATE PROCEDURE `set_piece`(s_name varchar(255), start_x tinyint,  start_y tinyint, end_x tinyint, end_y tinyint, p_token varchar(255))
 BEGIN 
@@ -909,7 +909,7 @@ DELIMITER ;
 -- Dumping structure for table battleships.ships
 DROP TABLE IF EXISTS `ships`;
 CREATE TABLE IF NOT EXISTS `ships` (
-  `ship_id` tinyint(1) NOT NULL AUTO_INCREMENT,									/*πίνακας πλοίων*/
+  `ship_id` tinyint(1) NOT NULL AUTO_INCREMENT,
   `player_id` tinyint(1) DEFAULT NULL,
   `ship_name` varchar(255) DEFAULT NULL,
   `ship_size` tinyint(1) DEFAULT NULL,
@@ -922,7 +922,7 @@ CREATE TABLE IF NOT EXISTS `ships` (
   CONSTRAINT `fk_type3` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table battleships.ships: ~10 rows (approximately)				/*εισαγωγή*/
+-- Dumping data for table battleships.ships: ~10 rows (approximately)
 INSERT INTO `ships` (`ship_id`, `player_id`, `ship_name`, `ship_size`, `start_row`, `end_row`, `start_col`, `end_col`) VALUES
 	(1, 1, 'Carrier', 5, NULL, NULL, NULL, NULL),
 	(2, 1, 'Battleship', 4, NULL, NULL, NULL, NULL),
@@ -936,7 +936,7 @@ INSERT INTO `ships` (`ship_id`, `player_id`, `ship_name`, `ship_size`, `start_ro
 	(10, 2, 'Destroyer', 2, NULL, NULL, NULL, NULL);
 
 -- Dumping structure for table battleships.targets
-DROP TABLE IF EXISTS `targets`;											/*πίνακας στόχων*/
+DROP TABLE IF EXISTS `targets`;
 CREATE TABLE IF NOT EXISTS `targets` (
   `target_id` tinyint(1) NOT NULL,
   `player_id` tinyint(1) DEFAULT NULL,
@@ -950,7 +950,7 @@ CREATE TABLE IF NOT EXISTS `targets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table battleships.targets: ~200 rows (approximately)
-INSERT INTO `targets` (`target_id`, `player_id`, `target_status`, `x_t`, `y_t`, `cell_status`) VALUES		/*εισαγωγή*/
+INSERT INTO `targets` (`target_id`, `player_id`, `target_status`, `x_t`, `y_t`, `cell_status`) VALUES
 	(1, 1, 'not_specified', 1, 1, NULL),
 	(1, 1, 'not_specified', 1, 2, NULL),
 	(1, 1, 'not_specified', 1, 3, NULL),
