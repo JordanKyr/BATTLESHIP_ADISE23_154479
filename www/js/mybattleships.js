@@ -425,7 +425,6 @@ function do_hit(){                                  //μέθοδος για έν
                             type: 'GET',
                             dataType: "json",
                             contentType: 'application/json',
-                            //data: JSON.stringify( {start_row: a[1], start_col: a[2], end_row: a[3], end_col: a[4]}),
                             headers: {"X-Token": me.token},
                             success: hit_result,
                             error: login_error});
