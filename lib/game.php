@@ -1,7 +1,7 @@
 <?php
 
 function show_game_status() {
-    global $mysqli;
+    global $mysqli;							//εμφάνιση game status 
 
 
 
@@ -18,7 +18,7 @@ function show_game_status() {
 
 
 
-function update_game_status() {                 //enimerosi kai elegxos status
+function update_game_status() {                 //ενημέρωση και έλεγχος game status
 	global $mysqli;
 	
 	$sql = 'select * from game_status';
@@ -31,29 +31,17 @@ function update_game_status() {                 //enimerosi kai elegxos status
 	
 	$new_status=null;
 	$new_turn=null;
-	
-	// $st3=$mysqli->prepare('select count(*) as aborted from players WHERE last_action< (NOW() - INTERVAL 5 MINUTE)');
-	// $st3->execute();
-	// $res3 = $st3->get_result();
-	// $aborted = $res3->fetch_assoc()['aborted'];
-	// if($aborted>0) {
-	// 	$sql = 'UPDATE players SET username=NULL, token=NULL WHERE last_action< (now() - INTERVAL 5 MINUTE)';
-	// 	$st2 = $mysqli->prepare($sql);
-	// 	$st2->execute();
-	// 	if($status['game_stat']=='started') {
-	// 		$new_status='aborted';
-	// 	}
-	// }
+
 
 	
-	$sql = 'select count(*) as c from players where username is not null';
+	$sql = 'select count(*) as c from players where username is not null';	//μέτρηση συνδεδεμένων παικτών
 	$st = $mysqli->prepare($sql);
 	$st->execute();
 	$res = $st->get_result();
 	$active_players = $res->fetch_assoc()['c'];
 	
 	
-	switch($active_players) {
+	switch($active_players) {								//έλεγχος κατάστασης ανάλογα τον αριθμό παικτών
 		case 0: $new_status='not active'; break;
 		case 1: $new_status='initialized'; break;
 		case 2: $new_status='started'; 
@@ -62,7 +50,7 @@ function update_game_status() {                 //enimerosi kai elegxos status
 				}
 				break;
 	}
-
+																	//ενημέρωση game status
 	$sql = 'update game_status set game_stat=?, p_turn=?';
 	$st = $mysqli->prepare($sql);
 	$st->bind_param('ss',$new_status,$new_turn);
@@ -73,7 +61,7 @@ function update_game_status() {                 //enimerosi kai elegxos status
 }       
 
 
-function read_status() {
+function read_status() {						//διάβασμα και επιστροφή game status
 
 	
 	global $mysqli;
@@ -104,7 +92,7 @@ function placed_ships($token){
 	}
 	else {
 
-			$new_status='ships_placed';
+			$new_status='ships_placed'; 				//επόμενος παίκτης και ενημέρωση game status
 
 			$sql = 'update game_status set game_stat=?';
 			$st = $mysqli->prepare($sql);

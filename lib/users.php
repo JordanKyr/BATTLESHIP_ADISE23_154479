@@ -3,7 +3,7 @@
 
 
 function handle_user($method, $b,$input) {
-	if($method=='GET') {
+	if($method=='GET') {							
 		show_user($b);
 	} else if($method=='PUT') {
         set_user($b,$input);
@@ -11,7 +11,7 @@ function handle_user($method, $b,$input) {
 }
 
 function show_user($b) {
-	global $mysqli;
+	global $mysqli;														//επιστροφή στοιχείων παίκτη
 	$sql = 'select player_id,username from players where player_id=?';
 	$st = $mysqli->prepare($sql);
 	$st->bind_param('s',$b);
@@ -23,7 +23,7 @@ function show_user($b) {
 
 function set_user($b, $input){
 
-
+																	//εισαγωγή στοιχείων παίκτη
 	if(!isset($input['username']) || $input['username']=='') {
 		header("HTTP/1.1 400 Bad Request");
 		print json_encode(['errormesg'=>"No username given."]);
@@ -37,7 +37,7 @@ function set_user($b, $input){
 	$st->execute();
 	$res = $st->get_result();
 	$r = $res->fetch_all(MYSQLI_ASSOC);
-	if($r[0]['c']>0) {
+	if($r[0]['c']>0) {															//έλεγχος τιμών
 		header("HTTP/1.1 400 Bad Request");
 		print json_encode(['errormesg'=>"Player $b is already set. Please select another player."]);
 		exit;
@@ -49,7 +49,7 @@ function set_user($b, $input){
 
 
 	
-	update_game_status();
+	update_game_status();									//ενημέρωση game_status
 	$sql = 'select * from players where player_id=?';
 	$st = $mysqli->prepare($sql);
 	$st->bind_param('s',$b);
@@ -64,7 +64,7 @@ function set_user($b, $input){
 
 
 
-function current_player($token) {
+function current_player($token) {				//επιστρέφει τον τρέχον παίκτη
 	
 
 	global $mysqli;

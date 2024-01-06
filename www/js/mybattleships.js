@@ -1,6 +1,6 @@
-//global metavlites
+//global μεταβλητές
 
-var me={};
+var me={};                      
 var game_status={};
 var count_ships=0;
 var ships_placed_flag=0;
@@ -12,7 +12,7 @@ $( function() {
 
 
    
-    $('#target_title').hide();
+    $('#target_title').hide();              
     $('#fleet_title').hide();
     
     $('#do_place').click( do_place);     //κουμπί-μέθοδος για τοποθέτηση πλοίου
@@ -27,7 +27,7 @@ $( function() {
 
 });
 
-function draw_ship_info_table(){
+function draw_ship_info_table(){                    //δημιουργία πίνακα για τα στοιχεία πλοίων
     var t3='<table id="table_ship_info">';
     for(var i=1; i<=5; i++) {
         
@@ -51,7 +51,7 @@ function draw_ship_info_table(){
 }
 
 
-function fill_ships(){
+function fill_ships(){      //γέμισμα πίνακα πλοίων με ajax call
     $.ajax({
         type: 'GET',
         url: "battleships.php/ships/",
@@ -88,8 +88,8 @@ var i=1;
 }
 
 
-function draw_start_table() {
-	
+function draw_start_table() {          //δημιουργία πίνακα για target και projection 
+	     
     var t2='<table id="table_target">';
 	for(var i=1; i<=10 ; i++) {
 
@@ -125,12 +125,12 @@ function draw_start_table() {
 
 
 
-function reset_projection(){
+function reset_projection(){   //αρχικοποίηση παιχνιδιού
   
-    alert("Game Reseted!")
+    alert("Game Reseted!")       //ajax call POST 
     $.ajax({
         type: 'POST',
-        url: "battleships.php/projection/",
+        url: "battleships.php/projection/", 
         headers: {"X-Token": me.token},
         success: fill_projection_by_data  
        
@@ -150,9 +150,9 @@ function reset_projection(){
 
 
 function fill_projection() {
-
-    
-    $.ajax({
+                                 //κάλεσμα ajax για εισαγωγή στοιχείων target & projection
+     
+    $.ajax({           
             type: 'GET',
             url: "battleships.php/projection/",
             headers: {"X-Token": me.token},
@@ -167,11 +167,11 @@ function fill_projection() {
 }
 
 function fill_projection_by_data(data){
-
-    
+                
+                        //εισαγωγή στοιχείων target & projection
 
     var projection_array=data.slice(0,100);
-                                         //pairno se enan pinaka ta projection kai se allon ta targets
+                                                //ενας πίνακας για το projection και ένας για target
 
     var targets_array=data.slice(100,200);
 
@@ -195,7 +195,7 @@ function fill_projection_by_data(data){
             var id = '#square_' + o.x_p + '_' + o.y_p;
             
             
-            if(o.cell_status=='1') {
+            if(o.cell_status=='1') {          //αντίστοιχες εικόνες στα κελιά με πλοία
 
                     switch(o.ship_name){
                         case 'Carrier': $(id).html('<img src="./images/carrier.png" alt="carrier_image" ></img>') ;  break;
@@ -231,7 +231,7 @@ function fill_projection_by_data(data){
             var id = '#square_target_' + o.x_t + '_' + o.y_t;
             //var c = (o.target_status=='not_specified') ?  '' :'1';
 
-            var c =o.target_status;
+            var c =o.target_status;                             //αντίστοιχες εικόνες στα κελιά που έχουν χτυπηθεί
             switch(c){
                 case 'not_specified': $(id).html(''); 
                 break;
@@ -260,7 +260,7 @@ function fill_projection_by_data(data){
 
 function login_to_game() {
 	if($('#username').val()=='') {
-		alert('You have to set a username');
+		alert('You have to set a username');    //login ajax call PUT με τα στοιχεία του παίκτη
 		return;
 	}
 	var p_id = $('#player_id').val();
@@ -280,7 +280,7 @@ function login_to_game() {
 }
 
 function login_result(data) {
-    me = data[0];
+    me = data[0];                                  //εμφάνιση πινάκων και στοιχείων μετά το login
     draw_start_table();
     fill_projection();
 	
@@ -306,7 +306,7 @@ function login_error(data,y,z,c) {
 	alert(x.errormesg);
 }
 
-function update_info(){
+function update_info(){      //κείμενο για επιστροφή στοιχείων παίκτη και παιχνιδιού
    
     if(game_ended_flag==0){
 	$('#game_info').html("I am Player: "+me.player_id+", my name is "+me.username +'<br>Token='+me.token+'<br>Game state: '+game_status.game_stat+', '+ game_status.p_turn+' must play now.');
@@ -321,28 +321,28 @@ function update_info(){
 
 
 
-function game_status_update() {
+function game_status_update() {                   
 	$.ajax({url: "battleships.php/game_status/",headers: {"X-Token": me.token}, success: update_status });
 }
 
-function update_status(data) {
+function update_status(data) {    //ενημέρωση game status 
 	game_status=data[0];
 	update_info();
     
-    if(game_status.game_stat=='ships_placed' && ships_placed_flag==0)
+    if(game_status.game_stat=='ships_placed' && ships_placed_flag==0)      //περίπτωση που έχουν τοποθετηθεί όλα τα πλοία
     {
             alert("Both Players Placed all the Ships");                                             
             ships_placed_flag=1;
            
     }else if(game_status.game_stat=='ships_placed' && ships_placed_flag==1 && game_status.p_turn==me.player_id){
-        
+                                                        //αν έχουν τοποθετηθεί τα πλοία παιρνάμε στη φάση χτυπημάτων και εμφανίζεται το input για τις συντεταγμένες
         $('#hit_div').show(500);
     }
     else {   $('#hit_div').hide(500);}
 
 	if(game_status.p_turn==me.player_id &&  me.player_id!=null && ships_placed_flag==0) {
 		x=0;
-		// do play
+		// do play                                                  //μετά το login το input για τοποθέτηση πλοίου
 		$('#place_div').show(500);
 		setTimeout(function() { game_status_update();}, 15000);
 	} else {
@@ -352,7 +352,7 @@ function update_status(data) {
 	}
     
     if(game_status.p_turn==1 && game_status.game_stat=='ended' && game_ended_flag==0) {
-        alert("1st Player Wins! Game Ended");  
+        alert("1st Player Wins! Game Ended");                                               //έλεγχος νικητή
         game_ended_flag=1; 
         }
     
@@ -369,7 +369,7 @@ function update_status(data) {
 
 function do_place() {
         
- if(count_ships<5){
+ if(count_ships<5){                                                     //καλεί ajax PUT για να στείλει τα στοιχεία τοποθέτησης πλοίου
             var s = $('#place_ship').val();
             
             var a = s.trim().split(/[ ]+/);
@@ -393,7 +393,7 @@ function do_place() {
             
      
 
-
+                                        //επιστρέφει τον πίνακα μετά την τοποθέτηση πλοίου
 function move_result(data) 
 {
     fill_projection_by_data(data);
@@ -433,7 +433,7 @@ function do_hit(){                                  //μέθοδος για έν
 
 }
 
-function hit_result(data)
+function hit_result(data)           //επιστροφή κατάστασης πινάκων μετά το χτύπημα πλοίου.
 {
 
 

@@ -2,7 +2,7 @@
 
 function show_ships() {
     global $mysqli;
-  
+                                        //επιστροφή πίνακα πλοίων
 
 
 
@@ -76,7 +76,7 @@ function check_coord($s_name, $x_start, $y_start, $x_end, $y_end,$token){       
     $count_y=0;
 
 
-        
+                                                                                    //έλεγχος για άδεια κελιά ανά γραμμή
             while( $c_stat_x!=1 && $count_x < ($x_end - $x_start + 1) ){
                 $sum_count_start_x= $count_x+$x_start;
 
@@ -90,7 +90,7 @@ function check_coord($s_name, $x_start, $y_start, $x_end, $y_end,$token){       
                 $count_x= $count_x+1;
 
             }
-
+                                                                                            //έλεγχος για άδεια κελιά ανα στύλη
             while( $c_stat_y!=1 && $count_y < ($y_end - $y_start + 1) ){
                 $sum_count_start_y= $count_y+$y_start;
                 $sql= 'select cell_status as c_stat from projection where y_p=? and x_p=? and player_id=?';

@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS game_status_clean;
 DROP TABLE IF EXISTS projection_clean;
 DROP TABLE IF EXISTS players_clean;
 
-CREATE TABLE players_clean (                          /* pinakas paikton*/
+CREATE TABLE players_clean (                          /* πίνακας παικτών*/
     player_id tinyint(1)  NOT NULL,
     username VARCHAR(20) DEFAULT NULL,
     token VARCHAR(255) DEFAULT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE players_clean (                          /* pinakas paikton*/
 );
 
 
-CREATE TABLE projection_clean (                                       /*pinakas toy board kathe paikti*/
+CREATE TABLE projection_clean (                                       /*πίνακας board κάθε παίκτη*/
         projection_id tinyint(1) NOT NULL,
         player_id tinyint(1) DEFAULT NULL, 
         x_p tinyint(1) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE projection_clean (                                       /*pinakas 
 );
 
 
-CREATE TABLE game_status_clean (                                                                                      /*pinakas katastasis paixnidiou*/
+CREATE TABLE game_status_clean (                                                                                      /*πίνακας κατάστασης παιχνιδιού*/
        game_id tinyint(1) NOT NULL AUTO_INCREMENT,
         game_stat ENUM('not active','initialized','started','ships_placed','ended','aborded') NOT NULL DEFAULT 'not active',
         p_turn ENUM('1','2') DEFAULT NULL,
@@ -67,15 +67,15 @@ CREATE TABLE game_status_clean (                                                
         PRIMARY KEY(game_id)
 );
 
-INSERT INTO game_status_clean(game_stat,p_turn,result,last_change)  VALUE                     /*arxikopoiisi status paixnidiou*/
+INSERT INTO game_status_clean(game_stat,p_turn,result,last_change)  VALUE                     /*αρχικοποίηση στάτους παιχνιδιού*/
 ('not active',NULL, NULL, NULL); 
 
-INSERT INTO players_clean(player_id,username,token,last_action) VALUES                        /*eisagogi paikton ston pinaka, to paixnidi paizetai apo 2 paiktes*/
+INSERT INTO players_clean(player_id,username,token,last_action) VALUES                        /*εισαγωγή στοιχείων*/
                 (1,NULL,NULL,NULL), 
                 (2, NULL,NULL,NULL);
 
 
-CREATE TABLE ships_clean (                                                                    /*pinakas karavion, ton onomaton kai ton xaraktiristikon tous*/
+CREATE TABLE ships_clean (                                                                    /*πίνακας πλοίων*/
         ship_id tinyint(1) NOT NULL AUTO_INCREMENT,
         player_id tinyint(1) DEFAULT NULL,
         ship_name VARCHAR(255) DEFAULT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE ships_clean (                                                      
         ON UPDATE CASCADE 
 );
 
-INSERT INTO ships_clean(ship_id, player_id,ship_name,ship_size,start_row,end_row,start_col,end_col) VALUES             /*arxikopoisi pinaka ploion*/
+INSERT INTO ships_clean(ship_id, player_id,ship_name,ship_size,start_row,end_row,start_col,end_col) VALUES             /*αρχικοποίηση πλοίων*/
          	(1, 1, 'Carrier', 5, NULL, NULL, NULL, NULL),
 	(2, 1, 'Battleship', 4, NULL, NULL, NULL, NULL),
 	(3, 1, 'Cruiser', 3, NULL, NULL, NULL, NULL),
@@ -107,7 +107,7 @@ INSERT INTO ships_clean(ship_id, player_id,ship_name,ship_size,start_row,end_row
 	(10, 2, 'Destroyer', 2, NULL, NULL, NULL, NULL);
 
                 
-                                                                                         /*pinakas stoxon*/
+                                                                                         /*πίνακας στόχων*/
 CREATE TABLE targets_clean(
         target_id tinyint(1) NOT NULL,
         player_id tinyint(1) DEFAULT NULL,
@@ -126,7 +126,7 @@ CREATE TABLE targets_clean(
 );
 
 
-INSERT INTO targets_clean(target_id, player_id, x_t, y_t) VALUES
+INSERT INTO targets_clean(target_id, player_id, x_t, y_t) VALUES			/*εισαγωγή*/
                             (1, 1, 1, 1),
                             (1, 1, 2, 1),
                             (1, 1, 3, 1),
@@ -330,7 +330,7 @@ INSERT INTO targets_clean(target_id, player_id, x_t, y_t) VALUES
                             (2, 2, 10, 10) ;
 
 
-INSERT INTO projection_clean(projection_id, player_id, x_p, y_p, cell_status) VALUES                                                  /*dimiourgia ton board ton 2 paikton*/
+INSERT INTO projection_clean(projection_id, player_id, x_p, y_p, cell_status) VALUES                      /*εισαγωγή*/
                (1, 1, 1, 1, NULL),
 	(1, 1, 1, 2, NULL),
 	(1, 1, 1, 3, NULL),
@@ -531,7 +531,7 @@ INSERT INTO projection_clean(projection_id, player_id, x_p, y_p, cell_status) VA
 	(2, 2, 10, 8, NULL),
 	(2, 2, 10, 9, NULL),
 	(2, 2, 10, 10, NULL);
-
+															/*εισαγωγή στους κύριους πίνακες δηλαδή καθάρισμα των τιμών*/
 REPLACE INTO players SELECT * FROM players_clean; 
 REPLACE INTO projection SELECT * FROM projection_clean;
 REPLACE INTO game_status SELECT * FROM game_status_clean;
@@ -554,7 +554,7 @@ DROP TABLE IF EXISTS players_clean;
 DELIMITER ;
 
 -- Dumping structure for table battleships.game_status
-DROP TABLE IF EXISTS `game_status`;
+DROP TABLE IF EXISTS `game_status`;								/*πίνακας κατάστασης παιχνιδιού*/
 CREATE TABLE IF NOT EXISTS `game_status` (
   `game_id` tinyint(1) NOT NULL AUTO_INCREMENT,
   `game_stat` enum('not active','initialized','started','ships_placed','ended','aborded') NOT NULL DEFAULT 'not active',
@@ -564,12 +564,12 @@ CREATE TABLE IF NOT EXISTS `game_status` (
   PRIMARY KEY (`game_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table battleships.game_status: ~1 rows (approximately)
+-- Dumping data for table battleships.game_status: ~1 rows (approximately)							/* εισαγωγή στοιχείων*/
 INSERT INTO `game_status` (`game_id`, `game_stat`, `p_turn`, `result`, `last_change`) VALUES
 	(1, 'not active', NULL, NULL, NULL);
 
 -- Dumping structure for procedure battleships.hit_piece
-DROP PROCEDURE IF EXISTS `hit_piece`;
+DROP PROCEDURE IF EXISTS `hit_piece`;											/*μέθοδος για χτύπημα*/
 DELIMITER //
 CREATE PROCEDURE `hit_piece`(x tinyint, y tinyint, p_token varchar(255))
 BEGIN 
@@ -592,7 +592,7 @@ BEGIN
                                         IF (target_from_projection  IS NULL)THEN 
                                         BEGIN 
                                                
-                                                UPDATE targets                                                                        /*elegxoi gia an xtipise ploio*/
+                                                UPDATE targets                                                                        /*έλεγχοι αν χτύπησε το πλοίο*/
                                                 SET target_status='miss'
                                                 WHERE player_id=enemy_player AND x_t=x AND y_t=y; 
                                                
@@ -616,7 +616,7 @@ BEGIN
 DELIMITER ;
 
 -- Dumping structure for table battleships.players
-DROP TABLE IF EXISTS `players`;
+DROP TABLE IF EXISTS `players`;								/*πίνακας παικτών*/
 CREATE TABLE IF NOT EXISTS `players` (
   `player_id` tinyint(1) NOT NULL,
   `username` varchar(20) DEFAULT NULL,
@@ -624,13 +624,13 @@ CREATE TABLE IF NOT EXISTS `players` (
   `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`player_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
+																				/*εισαγωγή*/
 -- Dumping data for table battleships.players: ~2 rows (approximately)
 INSERT INTO `players` (`player_id`, `username`, `token`, `last_action`) VALUES
-	(1, NULL, NULL, NULL),
+	(1, NULL, NULL, NULL),	
 	(2, NULL, NULL, NULL);
 
--- Dumping structure for table battleships.projection
+-- Dumping structure for table battleships.projection					/*πίνακας board*/
 DROP TABLE IF EXISTS `projection`;
 CREATE TABLE IF NOT EXISTS `projection` (
   `projection_id` tinyint(1) NOT NULL,
@@ -644,7 +644,7 @@ CREATE TABLE IF NOT EXISTS `projection` (
   CONSTRAINT `fk_type2` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table battleships.projection: ~200 rows (approximately)
+-- Dumping data for table battleships.projection: ~200 rows (approximately)								/*εισαγωγή*/
 INSERT INTO `projection` (`projection_id`, `player_id`, `x_p`, `y_p`, `cell_status`, `ship_name`) VALUES
 	(1, 1, 1, 1, NULL, NULL),
 	(1, 1, 1, 2, NULL, NULL),
@@ -848,7 +848,7 @@ INSERT INTO `projection` (`projection_id`, `player_id`, `x_p`, `y_p`, `cell_stat
 	(2, 2, 10, 10, NULL, NULL);
 
 -- Dumping structure for procedure battleships.set_piece
-DROP PROCEDURE IF EXISTS `set_piece`;
+DROP PROCEDURE IF EXISTS `set_piece`;							/*μέθοδος τοποθέτησης πλοίων*/
 DELIMITER //
 CREATE PROCEDURE `set_piece`(s_name varchar(255), start_x tinyint,  start_y tinyint, end_x tinyint, end_y tinyint, p_token varchar(255))
 BEGIN 
@@ -864,7 +864,7 @@ BEGIN
 			  SELECT ship_id INTO s_id FROM ships 
 			  WHERE ship_name = s_name and player_id=p_id;
               
-              SELECT cell_status INTO c_stat FROM projection                            /*pairno to status toy kelioy, elefthero h oxi*/
+              SELECT cell_status INTO c_stat FROM projection                            /*παίρενω κατάσταση κελιού, άδειο ή όχι*/
               WHERE  x_p=start_x AND y_p=start_y AND player_id=p_id;
                 
 
@@ -874,27 +874,27 @@ BEGIN
                 set count_y=start_y;
 
 /*LOOP FILL*/        fill_rows_ship: WHILE count_x <= end_x AND start_x<>end_x DO
-                UPDATE projection
+                UPDATE projection																		/*γέμισμα γραμμών projection*/
                 set cell_status=1, ship_name=s_name WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
                 
 				UPDATE targets
-                set cell_status=1 WHERE player_id=p_id AND x_t=count_x and y_t=count_y;
+                set cell_status=1 WHERE player_id=p_id AND x_t=count_x and y_t=count_y;     /*ενημέρωση πίνακα target*/
 
 				set count_x= count_x+1;
-                END WHILE fill_rows_ship;
+                END WHILE fill_rows_ship;																	
 
-/*LOOP FILL*/        fill_cols_ship: WHILE count_y <= end_y AND start_y<>end_y DO
-                UPDATE projection
+/*LOOP FILL*/        fill_cols_ship: WHILE count_y <= end_y AND start_y<>end_y DO									
+                UPDATE projection														/*γέμισμα στηλών projection*/
                 set cell_status=1, ship_name=s_name WHERE player_id=p_id AND x_p=count_x and y_p=count_y;
 				
 				UPDATE targets
-                set cell_status=1 WHERE player_id=p_id AND x_t=count_x and y_t=count_y;
+                set cell_status=1 WHERE player_id=p_id AND x_t=count_x and y_t=count_y;       /*ενημέρωση πίνακα target*/
 
                 set count_y= count_y+1;     
                 END WHILE fill_cols_ship;           
-
+																				 /*ενημέρωση πίνακα ships*/
                 UPDATE ships
-                set start_row=start_x, end_row=end_x,start_col=start_y, end_col=end_y                                                 /*enimerosi thesis ploiou kai game status*/
+                set start_row=start_x, end_row=end_x,start_col=start_y, end_col=end_y                                               
                 where ship_id=s_id and player_id=p_id;
 
              
@@ -909,7 +909,7 @@ DELIMITER ;
 -- Dumping structure for table battleships.ships
 DROP TABLE IF EXISTS `ships`;
 CREATE TABLE IF NOT EXISTS `ships` (
-  `ship_id` tinyint(1) NOT NULL AUTO_INCREMENT,
+  `ship_id` tinyint(1) NOT NULL AUTO_INCREMENT,									/*πίνακας πλοίων*/
   `player_id` tinyint(1) DEFAULT NULL,
   `ship_name` varchar(255) DEFAULT NULL,
   `ship_size` tinyint(1) DEFAULT NULL,
@@ -922,7 +922,7 @@ CREATE TABLE IF NOT EXISTS `ships` (
   CONSTRAINT `fk_type3` FOREIGN KEY (`player_id`) REFERENCES `players` (`player_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
 
--- Dumping data for table battleships.ships: ~10 rows (approximately)
+-- Dumping data for table battleships.ships: ~10 rows (approximately)				/*εισαγωγή*/
 INSERT INTO `ships` (`ship_id`, `player_id`, `ship_name`, `ship_size`, `start_row`, `end_row`, `start_col`, `end_col`) VALUES
 	(1, 1, 'Carrier', 5, NULL, NULL, NULL, NULL),
 	(2, 1, 'Battleship', 4, NULL, NULL, NULL, NULL),
@@ -936,7 +936,7 @@ INSERT INTO `ships` (`ship_id`, `player_id`, `ship_name`, `ship_size`, `start_ro
 	(10, 2, 'Destroyer', 2, NULL, NULL, NULL, NULL);
 
 -- Dumping structure for table battleships.targets
-DROP TABLE IF EXISTS `targets`;
+DROP TABLE IF EXISTS `targets`;											/*πίνακας στόχων*/
 CREATE TABLE IF NOT EXISTS `targets` (
   `target_id` tinyint(1) NOT NULL,
   `player_id` tinyint(1) DEFAULT NULL,
@@ -950,7 +950,7 @@ CREATE TABLE IF NOT EXISTS `targets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dumping data for table battleships.targets: ~200 rows (approximately)
-INSERT INTO `targets` (`target_id`, `player_id`, `target_status`, `x_t`, `y_t`, `cell_status`) VALUES
+INSERT INTO `targets` (`target_id`, `player_id`, `target_status`, `x_t`, `y_t`, `cell_status`) VALUES		/*εισαγωγή*/
 	(1, 1, 'not_specified', 1, 1, NULL),
 	(1, 1, 'not_specified', 1, 2, NULL),
 	(1, 1, 'not_specified', 1, 3, NULL),

@@ -2,7 +2,7 @@
 
 
 
-function show_projection($token) {
+function show_projection($token) {          //επιστροφή projection & target για τον συγκεκριμενο παίκτη
     global $mysqli;
 
     
@@ -24,7 +24,7 @@ function show_projection($token) {
     $json_obj1 =json_encode($res->fetch_all(MYSQLI_ASSOC), JSON_PRETTY_PRINT);
     
     
-    $plid=($plid==1)?$plid=2 : $plid=1;
+    $plid=($plid==1)?$plid=2 : $plid=1;     //αλλαγή παίκτη για να πάρω το targets
 
     $sql2= 'select * from targets where player_id=?';
     $st2 = $mysqli->prepare($sql2);
@@ -41,7 +41,7 @@ function show_projection($token) {
 
 
 }
-
+                                            //καλεί το clean_all απο τη βάση για να κάνω reset και επιστρέφω τα projection & target
 function reset_game($token) {
     global $mysqli;
 
@@ -51,24 +51,24 @@ function reset_game($token) {
     show_projection($token);
 }
 
-
+                                                                            //καλεί το set_piece με τις συντεταγμένες που έδωσε ο παίκτης
 function do_place($s_name, $x_start, $y_start, $x_end, $y_end, $token){
     global $mysqli;
-	$sql = 'call `set_piece`(?,?,?,?,?,?);';
+	$sql = 'call `set_piece`(?,?,?,?,?,?);';                                            
 	$st = $mysqli->prepare($sql);
 	$st->bind_param('siiiis',$s_name,$x_start,$y_start,$x_end,$y_end,$token );
 	$st->execute();
-
+                                            //επιστρέφει projection & target
 	show_projection($token);
 
 
 }
 
-function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
+function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){       //μέθοδος για τοποθέτηση πλοίου
 
-
+                                                             
         if($token==null || $token=='') {
-            header("HTTP/1.1 400 Bad Request");
+            header("HTTP/1.1 400 Bad Request");                       //έλεγχος τιμών εισαγωγής
             print json_encode(['errormesg'=>"token is not set."]);
             exit;
         }
@@ -92,7 +92,7 @@ function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
         }
         
 
-        if(check_coord($s_name, $x_start, $y_start, $x_end, $y_end,$token )){
+        if(check_coord($s_name, $x_start, $y_start, $x_end, $y_end,$token )){  //έλεγχος συντεταγμένων
         
 
             if(check_size($s_name, $x_start, $y_start, $x_end, $y_end)){            //αν δεν υπάρχει λάθος στις τιμές συντεταγμένων και το μέγεθος του πλοίου συνέχισε
@@ -112,8 +112,8 @@ function place_ship($s_name, $x_start, $y_start, $x_end, $y_end, $token){
                         }
  }
 function hit_ship($x,$y,$token){
-   
-    if($token==null || $token=='') {
+                                                //μέθοδος για χτύπημα πλοίου
+    if($token==null || $token=='') {                                          //έλεγχοι τιμών εισαγωγής
         header("HTTP/1.1 400 Bad Request");
         print json_encode(['errormesg'=>"token is not set."]);
         exit;
@@ -138,7 +138,7 @@ function hit_ship($x,$y,$token){
     }
     
 
-    if($x>10 || $x<1 || $y>10 || $y<1 ){          //εκτός ορίων
+    if($x>10 || $x<1 || $y>10 || $y<1 ){          //εκτός ορίων 
         header("HTTP/1.1 400 Bad Request");
         print json_encode(['errormesg'=>"Coordinates error: Out of Bounds."]);    
         return(false);     
@@ -180,7 +180,7 @@ function hit_ship($x,$y,$token){
 
 function do_hit($x,$y,$token){
     
-                                        //καλώ την sql μέθοδο για το χτύπημα με τις συντεταγμένες και το token
+                                        //καλεί την sql μέθοδο για το χτύπημα με τις συντεταγμένες και το token
     
     global $mysqli;
 	$sql = 'call `hit_piece`(?,?,?);';
